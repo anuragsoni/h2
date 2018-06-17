@@ -1,0 +1,13 @@
+lib: [
+  "_build/install/default/lib/h2/META" {"META"}
+  "_build/install/default/lib/h2/opam" {"opam"}
+  "_build/install/default/lib/h2/h2.cmi" {"h2.cmi"}
+  "_build/install/default/lib/h2/h2.cmx" {"h2.cmx"}
+  "_build/install/default/lib/h2/h2.cmt" {"h2.cmt"}
+  "_build/install/default/lib/h2/h2.ml-gen" {"h2.ml-gen"}
+  "_build/install/default/lib/h2/h2.cma" {"h2.cma"}
+  "_build/install/default/lib/h2/h2.cmxa" {"h2.cmxa"}
+  "_build/install/default/lib/h2/h2.a" {"h2.a"}
+  "_build/install/default/lib/h2/h2.cmxs" {"h2.cmxs"}
+  "_build/install/default/lib/h2/h2.dune" {"h2.dune"}
+]
