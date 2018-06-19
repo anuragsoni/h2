@@ -1,5 +1,3 @@
-let frame_header_size = 9
-
 type frame_type =
   | Data
   | Headers
@@ -92,6 +90,59 @@ let error_code_of_id = function
 
 let pow a b = a lsl (b - 1)
 
-let max_payload_length = pow 2 14
+(* Frame size: https://httpwg.org/specs/rfc7540.html#rfc.section.4.2 *)
+let max_payload_length = pow 2 24 - 1
+
+let frame_header_size = 9
 
 type frame_header = {payload_length: int; flags: int; stream_id: int}
+
+(* Frame definitions https://httpwg.org/specs/rfc7540.html#rfc.section.6 *)
+(* https://httpwg.org/specs/rfc7540.html#rfc.section.6.3 *)
+type priority =
+  {exclusive_dependency: bool; stream_dependency: int; weight: int}
+
+(* https://httpwg.org/specs/rfc7540.html#rfc.section.6.2 *)
+type headers_frame =
+  { priority: priority option
+  ; pad_length: int option
+  ; header_block_fragment: bytes }
+
+(* https://httpwg.org/specs/rfc7540.html#rfc.section.6.4 *)
+type rst_stream = int
+
+(* https://httpwg.org/specs/rfc7540.html#rfc.section.6.5 *)
+type settings_identifier =
+  | HeaderTableSize
+  | EnablePush
+  | MaxConcurrentStreams
+  | InitialWindowSize
+  | MaxFrameSize
+  | MaxHeaderListSize
+
+type settings_value = int
+
+let settings_identifier_to_int = function
+  | HeaderTableSize -> 1
+  | EnablePush -> 2
+  | MaxConcurrentStreams -> 3
+  | InitialWindowSize -> 4
+  | MaxFrameSize -> 5
+  | MaxHeaderListSize -> 6
+
+let int_to_settings_identifier = function
+  | 1 -> HeaderTableSize
+  | 2 -> EnablePush
+  | 3 -> MaxConcurrentStreams
+  | 4 -> InitialWindowSize
+  | 5 -> MaxFrameSize
+  | 6 -> MaxHeaderListSize
+  | _ -> failwith "Invalid value for settings identifier"
+
+type settings_list = (settings_identifier * settings_value) list
+
+type frame_payload =
+  | DataFrame of bytes
+  | HeadersFrame of headers_frame
+  | RSTStreamFrame of rst_stream
+  | SettingsFrame of settings_list
