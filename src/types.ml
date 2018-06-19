@@ -37,6 +37,8 @@ let frame_type_of_id = function
   | 9 -> Continuation
   | x -> Unknown x
 
+type error_code_id = int
+
 type error_code =
   | NoError
   | ProtocolError
@@ -52,7 +54,7 @@ type error_code =
   | EnhanceYourCalm
   | InadequateSecurity
   | HTTP11Required
-  | Unknown of int
+  | Unknown of error_code_id
 
 let error_code_to_id = function
   | NoError -> 0
@@ -91,25 +93,29 @@ let error_code_of_id = function
 let pow a b = a lsl (b - 1)
 
 (* Frame size: https://httpwg.org/specs/rfc7540.html#rfc.section.4.2 *)
+type header_block_fragment = bytes
+
+type stream_id = int
+
 let max_payload_length = pow 2 24 - 1
 
 let frame_header_size = 9
 
-type frame_header = {payload_length: int; flags: int; stream_id: int}
+type frame_header = {payload_length: int; flags: int; stream_id: stream_id}
 
 (* Frame definitions https://httpwg.org/specs/rfc7540.html#rfc.section.6 *)
+
 (* https://httpwg.org/specs/rfc7540.html#rfc.section.6.3 *)
+type weight = int
 type priority =
-  {exclusive_dependency: bool; stream_dependency: int; weight: int}
+  {exclusive_dependency: bool; stream_dependency: stream_id; weight: weight}
 
 (* https://httpwg.org/specs/rfc7540.html#rfc.section.6.2 *)
 type headers_frame =
-  { priority: priority option
-  ; pad_length: int option
-  ; header_block_fragment: bytes }
+  {priority: priority option; header_block_fragment: header_block_fragment}
 
 (* https://httpwg.org/specs/rfc7540.html#rfc.section.6.4 *)
-type rst_stream = int
+type rst_stream = error_code_id
 
 (* https://httpwg.org/specs/rfc7540.html#rfc.section.6.5 *)
 type settings_identifier =
@@ -146,3 +152,6 @@ type frame_payload =
   | HeadersFrame of headers_frame
   | RSTStreamFrame of rst_stream
   | SettingsFrame of settings_list
+  | PushPromiseFrame of stream_id * header_block_fragment
+  | PingFrame of bytes
+  | GoAwayFrame of stream_id * error_code_id * bytes
