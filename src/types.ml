@@ -147,6 +147,9 @@ let int_to_settings_identifier = function
 
 type settings_list = (settings_identifier * settings_value) list
 
+(* https://httpwg.org/specs/rfc7540.html#rfc.section.6.9 *)
+type window_size = int
+
 type frame_payload =
   | DataFrame of bytes
   | HeadersFrame of headers_frame
@@ -155,3 +158,4 @@ type frame_payload =
   | PushPromiseFrame of stream_id * header_block_fragment
   | PingFrame of bytes
   | GoAwayFrame of stream_id * error_code_id * bytes
+  | WindowUpdateFrame of window_size
