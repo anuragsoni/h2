@@ -1,41 +1,4 @@
-type frame_type =
-  | Data
-  | Headers
-  | Priority
-  | RSTStream
-  | Settings
-  | PushPromise
-  | Ping
-  | GoAway
-  | WindowUpdate
-  | Continuation
-  | Unknown of int
-
-let frame_type_to_id = function
-  | Data -> 0
-  | Headers -> 1
-  | Priority -> 2
-  | RSTStream -> 3
-  | Settings -> 4
-  | PushPromise -> 5
-  | Ping -> 6
-  | GoAway -> 7
-  | WindowUpdate -> 8
-  | Continuation -> 9
-  | Unknown x -> x
-
-let frame_type_of_id = function
-  | 0 -> Data
-  | 1 -> Headers
-  | 2 -> Priority
-  | 3 -> RSTStream
-  | 4 -> Settings
-  | 5 -> PushPromise
-  | 6 -> Ping
-  | 7 -> GoAway
-  | 8 -> WindowUpdate
-  | 9 -> Continuation
-  | x -> Unknown x
+type frame_type = int
 
 type error_code_id = int
 
@@ -104,9 +67,9 @@ let frame_header_size = 9
 type frame_header = {payload_length: int; flags: int; stream_id: stream_id}
 
 (* Frame definitions https://httpwg.org/specs/rfc7540.html#rfc.section.6 *)
-
 (* https://httpwg.org/specs/rfc7540.html#rfc.section.6.3 *)
 type weight = int
+
 type priority =
   {exclusive_dependency: bool; stream_dependency: stream_id; weight: weight}
 
@@ -153,6 +116,7 @@ type window_size = int
 type frame_payload =
   | DataFrame of bytes
   | HeadersFrame of headers_frame
+  | PriorityFrame of priority
   | RSTStreamFrame of rst_stream
   | SettingsFrame of settings_list
   | PushPromiseFrame of stream_id * header_block_fragment
