@@ -159,3 +159,5 @@ type frame_payload =
   | PingFrame of bytes
   | GoAwayFrame of stream_id * error_code_id * bytes
   | WindowUpdateFrame of window_size
+  | ContinuationFrame of header_block_fragment
+  | UnknownFrame of frame_type * bytes
