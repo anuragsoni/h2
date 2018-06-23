@@ -5,6 +5,10 @@ lib: [
   "_build/install/default/lib/h2/h2.cmx" {"h2.cmx"}
   "_build/install/default/lib/h2/h2.cmt" {"h2.cmt"}
   "_build/install/default/lib/h2/h2.ml-gen" {"h2.ml-gen"}
+  "_build/install/default/lib/h2/h2__Types.cmi" {"h2__Types.cmi"}
+  "_build/install/default/lib/h2/h2__Types.cmx" {"h2__Types.cmx"}
+  "_build/install/default/lib/h2/h2__Types.cmt" {"h2__Types.cmt"}
+  "_build/install/default/lib/h2/types.ml" {"types.ml"}
   "_build/install/default/lib/h2/h2.cma" {"h2.cma"}
   "_build/install/default/lib/h2/h2.cmxa" {"h2.cmxa"}
   "_build/install/default/lib/h2/h2.a" {"h2.a"}

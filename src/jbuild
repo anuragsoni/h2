@@ -3,4 +3,6 @@
 (library
   ((name h2)
    (public_name h2)
+   (preprocess (pps (bitstring.ppx ppx_fields_conv)))
+   (libraries (bitstring base))
    ))
