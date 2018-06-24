@@ -16,7 +16,7 @@
     ]}
 *)
 
-type frame_type =
+type t =
   | Data
   | Headers
   | Priority
@@ -28,8 +28,8 @@ type frame_type =
   | WindowUpdate
   | Continuation
 
-val frame_type_to_id : frame_type -> int
+val t_to_id : t -> int
 (** [frame_type_to_id] converts a [frame_type] to its integer representation *)
 
-val frame_type_of_id : int -> (frame_type, string) result
+val t_of_id : int -> (t, string) result
 (** [frame_type_of_id] converts an integer to frame_type *)
