@@ -343,6 +343,8 @@ type frame_header =
   ; flags : frame_flags
   ; stream_id : stream_id }
 
-type frame_payload = DataFrame of data_frame | PriorityFrame of priority
+type frame_payload = DataFrame of data_frame
+                   | HeadersFrame of priority option * string
+                   | PriorityFrame of priority
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}

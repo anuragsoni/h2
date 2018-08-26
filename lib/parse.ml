@@ -106,14 +106,14 @@ let parse_payload_with_padding frame_header parse_fn =
     let body_lenth = frame_header.length - pad_length - 1 in
     if body_lenth < 0 then
       return (Error (ConnectionError (ProtocolError, "padding is not enough")))
-    else lift parse_fn (take body_lenth)
-  else lift parse_fn (take frame_header.length)
+    else parse_fn body_lenth
+  else parse_fn frame_header.length
 
 let parse_data_frame frame_header =
-  parse_payload_with_padding frame_header (fun x ->
-      Ok {frame_header; frame_payload = DataFrame x} )
+  let parse_data length = lift (fun x -> Ok (DataFrame x)) (take length) in
+  parse_payload_with_padding frame_header parse_data
 
-let parse_priority_frame frame_header =
+let parse_priority =
   lift2
     (fun s w ->
       let s' = Int32.to_int_exn s in
@@ -121,11 +121,25 @@ let parse_priority_frame frame_header =
       let p =
         {exclusive = e; weight = w; stream_dependency = s' land ((1 lsl 31) - 1)}
       in
-      Ok {frame_header; frame_payload = PriorityFrame p} )
+      p )
     Angstrom.BE.any_int32 any_int8
 
-let get_parser_for_frame = function
-  | FrameData -> parse_data_frame
+let parse_priority_frame = parse_priority >>| fun x -> Ok (PriorityFrame x)
+
+let parse_header_frame frame_header =
+  let parse_fn =
+    if test_priority frame_header.flags then fun length ->
+      lift2
+        (fun priority headers -> Ok (HeadersFrame (Some priority, headers)))
+        parse_priority (take length)
+    else fun length -> lift (fun x -> Ok (HeadersFrame (None, x))) (take length)
+  in
+  parse_payload_with_padding frame_header parse_fn
+
+let get_parser_for_frame frame_header =
+  match frame_header.frame_type with
+  | FrameData -> parse_data_frame frame_header
+  | FrameHeaders -> parse_header_frame frame_header
   | FramePriority -> parse_priority_frame
   | _ -> failwith "not implemented yet"
 
@@ -134,7 +148,10 @@ let parse_frame settings =
   >>= fun frame_header ->
   match check_frame_header settings frame_header with
   | Ok frame_header ->
-      (get_parser_for_frame frame_header.frame_type) frame_header
+      get_parser_for_frame frame_header
+      >>= fun x ->
+      return
+        (Result.map x ~f:(fun frame_payload -> {frame_header; frame_payload}))
   | Error e -> return (Error e)
 
 let%test "read frame" =
