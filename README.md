@@ -5,3 +5,9 @@ Exploring HTTP/2 framing in OCaml. Attempting to use angstrom/faraday in the hop
 ### Goal
 
 Aim to provide decoder/encoder and HTTP/2 types to be consumed by other projects.
+
+### Contributing
+
+* Look for the unfinished payload types from `./lib/types.mli`
+* Parsing is done in `./lib/parse.ml`
+
