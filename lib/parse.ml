@@ -94,8 +94,30 @@ let parse_frame_header =
       {flags; length; frame_type; stream_id} )
     frame_length frame_type frame_flags stream_identifier
 
+let parse_payload_with_padding frame_header parse_fn =
+  if test_padded frame_header.flags then
+    any_int8
+    >>= fun pad_length ->
+    let body_lenth = frame_header.length - pad_length - 1 in
+    if body_lenth < 0 then
+      return (Error (ConnectionError (ProtocolError, "padding is not enough")))
+    else lift parse_fn (take body_lenth)
+  else lift parse_fn (take frame_header.length)
+
+let parse_data_frame frame_header =
+  parse_payload_with_padding frame_header (fun x -> Ok (DataFrame x))
+
+let get_parser_for_frame = function
+  | FrameData -> parse_data_frame
+  | _ -> failwith "not implemented yet"
+
 let parse_frame settings =
-  lift (fun x -> check_frame_header settings x) parse_frame_header
+  parse_frame_header >>= (fun frame_header ->
+    match check_frame_header settings frame_header with
+    | Ok frame_header -> (get_parser_for_frame frame_header.frame_type) frame_header
+    | Error e -> return (Error e)
+  )
+  (* lift (fun x -> check_frame_header settings x) parse_frame_header *)
 
 let%test "read frame" =
   let input = "\x01\x02\x03\x04\x05\x06\x07\x08\x09" in
