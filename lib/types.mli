@@ -179,7 +179,7 @@ type frame_header =
   ; flags: frame_flags
   ; stream_id: stream_id }
 
-type data_frame = bytes
+type data_frame = string
 
 type frame_payload = DataFrame of data_frame
 

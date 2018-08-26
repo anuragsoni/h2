@@ -328,7 +328,7 @@ let clear_exclusive id = clear_bit id 31
 
 (* HTTP/2 frame types *)
 
-type data_frame = bytes
+type data_frame = string
 
 type frame_header =
   { length: int

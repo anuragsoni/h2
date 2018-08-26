@@ -88,17 +88,17 @@ let frame_flags = any_uint8
 let stream_identifier =
   lift (fun x -> Int32.to_int_exn x land ((1 lsl 31) - 1)) Angstrom.BE.any_int32
 
-let decode_frame_header =
+let parse_frame_header =
   lift4
     (fun length frame_type flags stream_id ->
       {flags; length; frame_type; stream_id} )
     frame_length frame_type frame_flags stream_identifier
 
-let decode_frame settings =
-  lift (fun x -> check_frame_header settings x) decode_frame_header
+let parse_frame settings =
+  lift (fun x -> check_frame_header settings x) parse_frame_header
 
 let%test "read frame" =
   let input = "\x01\x02\x03\x04\x05\x06\x07\x08\x09" in
   Caml.Pervasives.( = )
-    (parse_string decode_frame_header input)
+    (parse_string parse_frame_header input)
     (Ok {length= 66051; frame_type= FrameSettings; flags= 5; stream_id= 101124105})
