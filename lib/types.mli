@@ -192,6 +192,6 @@ type frame_header =
 
 type data_frame = string
 
-type frame_payload = DataFrame of data_frame
+type frame_payload = DataFrame of data_frame | PriorityFrame of priority
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}

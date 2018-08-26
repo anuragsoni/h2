@@ -113,8 +113,20 @@ let parse_data_frame frame_header =
   parse_payload_with_padding frame_header (fun x ->
       Ok {frame_header; frame_payload = DataFrame x} )
 
+let parse_priority_frame frame_header =
+  lift2
+    (fun s w ->
+      let s' = Int32.to_int_exn s in
+      let e = test_bit s' 32 in
+      let p =
+        {exclusive = e; weight = w; stream_dependency = s' land ((1 lsl 31) - 1)}
+      in
+      Ok {frame_header; frame_payload = PriorityFrame p} )
+    Angstrom.BE.any_int32 any_int8
+
 let get_parser_for_frame = function
   | FrameData -> parse_data_frame
+  | FramePriority -> parse_priority_frame
   | _ -> failwith "not implemented yet"
 
 let parse_frame settings =
