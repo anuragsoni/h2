@@ -18,4 +18,4 @@ clean:
 	dune clean
 
 utop-frames:
-	dune utop frames
+	dune utop lib
