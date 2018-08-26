@@ -1,22 +1,21 @@
-.PHONY: default build install uninstall test clean utop
+.PHONY: default build install uninstall test clean utop-frames
 
 default: build
 
 build:
-	jbuilder build
+	dune build
 
 test:
-	jbuilder runtest -f
+	dune runtest -f
 
 install:
-	jbuilder install
+	dune install
 
 uninstall:
-	jbuilder uninstall
+	dune uninstall
 
 clean:
-	jbuilder clean
-	git clean -dfXq
+	dune clean
 
-utop:
-	jbuilder utop src
+utop-frames:
+	dune utop frames

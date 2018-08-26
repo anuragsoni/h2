@@ -1,0 +1,6 @@
+(library
+  (public_name frames)
+  (libraries base angstrom)
+  (inline_tests)
+  (preprocess (pps ppx_inline_test))
+  )
