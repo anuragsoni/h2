@@ -105,19 +105,20 @@ let parse_payload_with_padding frame_header parse_fn =
   else lift parse_fn (take frame_header.length)
 
 let parse_data_frame frame_header =
-  parse_payload_with_padding frame_header (fun x -> Ok (DataFrame x))
+  parse_payload_with_padding frame_header (fun x ->
+      Ok {frame_header; frame_payload= DataFrame x} )
 
 let get_parser_for_frame = function
   | FrameData -> parse_data_frame
   | _ -> failwith "not implemented yet"
 
 let parse_frame settings =
-  parse_frame_header >>= (fun frame_header ->
-    match check_frame_header settings frame_header with
-    | Ok frame_header -> (get_parser_for_frame frame_header.frame_type) frame_header
-    | Error e -> return (Error e)
-  )
-  (* lift (fun x -> check_frame_header settings x) parse_frame_header *)
+  parse_frame_header
+  >>= fun frame_header ->
+  match check_frame_header settings frame_header with
+  | Ok frame_header ->
+      (get_parser_for_frame frame_header.frame_type) frame_header
+  | Error e -> return (Error e)
 
 let%test "read frame" =
   let input = "\x01\x02\x03\x04\x05\x06\x07\x08\x09" in
