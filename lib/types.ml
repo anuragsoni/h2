@@ -123,20 +123,20 @@ let is_window_overflow w = test_bit w 31
 type settings_list = (settings_key_id * settings_value) list
 
 type settings =
-  { header_table_size: int
-  ; enable_push: bool
-  ; max_concurrent_streams: int option
-  ; initial_window_size: window_size
-  ; max_frame_size: int
-  ; max_header_list_size: int option }
+  { header_table_size : int
+  ; enable_push : bool
+  ; max_concurrent_streams : int option
+  ; initial_window_size : window_size
+  ; max_frame_size : int
+  ; max_header_list_size : int option }
 
 let default_settings =
-  { header_table_size= 4096
-  ; enable_push= true
-  ; max_concurrent_streams= None
-  ; initial_window_size= default_initial_window_size
-  ; max_frame_size= 16384
-  ; max_header_list_size= None }
+  { header_table_size = 4096
+  ; enable_push = true
+  ; max_concurrent_streams = None
+  ; initial_window_size = default_initial_window_size
+  ; max_frame_size = 16384
+  ; max_header_list_size = None }
 
 let check_settings_value = function
   | SettingsEnablePush, v ->
@@ -147,8 +147,7 @@ let check_settings_value = function
       if v > 2147483647 then
         Some
           (ConnectionError
-             ( FlowControlError
-             , "Window size must be less than or equal to 65535" ))
+             (FlowControlError, "Window size must be less than or equal to 65535"))
       else None
   | SettingsMaxFrameSize, v ->
       if v < 16395 || v > 16777215 then
@@ -165,16 +164,24 @@ let check_settings_list settings =
 
 let update_settings settings kvs =
   let update settings = function
-    | SettingsHeaderTableSize, v -> {settings with header_table_size= v}
-    | SettingsEnablePush, v -> {settings with enable_push= v > 0}
+    | SettingsHeaderTableSize, v -> {settings with header_table_size = v}
+    | SettingsEnablePush, v -> {settings with enable_push = v > 0}
     | SettingsMaxConcurrentStreams, v ->
-        {settings with max_concurrent_streams= Some v}
-    | SettingsInitialWindowSize, v -> {settings with initial_window_size= v}
-    | SettingsMaxFrameSize, v -> {settings with max_frame_size= v}
+        {settings with max_concurrent_streams = Some v}
+    | SettingsInitialWindowSize, v -> {settings with initial_window_size = v}
+    | SettingsMaxFrameSize, v -> {settings with max_frame_size = v}
     | SettingsMaxHeaderListSize, v ->
-        {settings with max_header_list_size= Some v}
+        {settings with max_header_list_size = Some v}
   in
   List.fold_left kvs ~init:settings ~f:update
+
+type weight = int
+
+type priority = {exclusive : bool; stream_dependency : stream_id; weight : weight}
+
+let default_priority = {exclusive = false; stream_dependency = 0; weight = 16}
+
+let highest_priority = {exclusive = false; stream_dependency = 0; weight = 256}
 
 (* Raw HTTP/2 frame types *)
 
@@ -331,11 +338,11 @@ let clear_exclusive id = clear_bit id 31
 type data_frame = string
 
 type frame_header =
-  { length: int
-  ; frame_type: frame_type_id
-  ; flags: frame_flags
-  ; stream_id: stream_id }
+  { length : int
+  ; frame_type : frame_type_id
+  ; flags : frame_flags
+  ; stream_id : stream_id }
 
 type frame_payload = DataFrame of data_frame
 
-type frame = {frame_header: frame_header; frame_payload: frame_payload}
+type frame = {frame_header : frame_header; frame_payload : frame_payload}

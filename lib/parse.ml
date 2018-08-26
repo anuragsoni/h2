@@ -12,11 +12,16 @@ let non_zero_frame_types =
   ; FramePushPromise
   ; FrameContinuation ]
 
+(* TODO: Go back and verify all these checks against spec. *)
 let check_frame_header settings frame_header =
   let open Polymorphic_compare in
   let {enable_push; _} = settings in
   let {flags; length; frame_type; stream_id} = frame_header in
   let check_frame_type = function
+    | FrameData when stream_id = 0x0 ->
+        Error
+          (ConnectionError
+             (ProtocolError, "data frames must be associated with a stream"))
     | FrameHeaders when test_padded flags && length < 1 ->
         Error
           (ConnectionError
@@ -106,7 +111,7 @@ let parse_payload_with_padding frame_header parse_fn =
 
 let parse_data_frame frame_header =
   parse_payload_with_padding frame_header (fun x ->
-      Ok {frame_header; frame_payload= DataFrame x} )
+      Ok {frame_header; frame_payload = DataFrame x} )
 
 let get_parser_for_frame = function
   | FrameData -> parse_data_frame
@@ -124,4 +129,8 @@ let%test "read frame" =
   let input = "\x01\x02\x03\x04\x05\x06\x07\x08\x09" in
   Caml.Pervasives.( = )
     (parse_string parse_frame_header input)
-    (Ok {length= 66051; frame_type= FrameSettings; flags= 5; stream_id= 101124105})
+    (Ok
+       { length = 66051
+       ; frame_type = FrameSettings
+       ; flags = 5
+       ; stream_id = 101124105 })

@@ -1,2 +1,5 @@
 wrap-comments=true
 margin=82
+doc-comments=before
+field-space=loose
+infix-precedence=parens

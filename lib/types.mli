@@ -14,7 +14,6 @@ type stream_id = int
 
 (** Error Codes. See: {{: http://http2.github.io/http2-spec/#ErrorCodes}
     http://http2.github.io/http2-spec/#ErrorCodes *)
-
 type error_code = int
 
 type error_code_id =
@@ -72,26 +71,38 @@ val is_window_overflow : window_size -> bool
 type settings_list = (settings_key_id * settings_value) list
 
 type settings =
-  { header_table_size: int
-  ; enable_push: bool
-  ; max_concurrent_streams: int option
-  ; initial_window_size: window_size
-  ; max_frame_size: int
-  ; max_header_list_size: int option }
+  { header_table_size : int
+  ; enable_push : bool
+  ; max_concurrent_streams : int option
+  ; initial_window_size : window_size
+  ; max_frame_size : int
+  ; max_header_list_size : int option }
 
 val default_settings : settings
 
-val check_settings_value :
-  settings_key_id * settings_value -> http2_error option
+val check_settings_value : settings_key_id * settings_value -> http2_error option
 
 val check_settings_list : settings_list -> http2_error option
 
 val update_settings : settings -> settings_list -> settings
 
+type weight = int
+
+type priority = {exclusive : bool; stream_dependency : stream_id; weight : weight}
+
+(** Default priority for all streams. See: {{:
+    http://http2.github.io/http2-spec/#pri-default}
+    http://http2.github.io/http2-spec/#pri-default} *)
+val default_priority : priority
+
+(** Maximum priority for any stream. See:
+    {{:http://http2.github.io/http2-spec/#rfc.section.5.3.2}
+    http://http2.github.io/http2-spec/#rfc.section.5.3.2} *)
+val highest_priority : priority
+
 (** The HTTP/2 frame type. See: {{:
     http://http2.github.io/http2-spec/#rfc.section.11.2}
     http://http2.github.io/http2-spec/#rfc.section.11.2} *)
-
 type frame_type = int
 
 type frame_type_id =
@@ -174,13 +185,13 @@ val clear_exclusive : stream_id -> stream_id
     {{:http://http2.github.io/http2-spec/#FrameHeader}
     http://http2.github.io/http2-spec/#FrameHeader}*)
 type frame_header =
-  { length: int
-  ; frame_type: frame_type_id
-  ; flags: frame_flags
-  ; stream_id: stream_id }
+  { length : int
+  ; frame_type : frame_type_id
+  ; flags : frame_flags
+  ; stream_id : stream_id }
 
 type data_frame = string
 
 type frame_payload = DataFrame of data_frame
 
-type frame = {frame_header: frame_header; frame_payload: frame_payload}
+type frame = {frame_header : frame_header; frame_payload : frame_payload}
