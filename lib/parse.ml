@@ -131,7 +131,8 @@ let parse_header_frame frame_header =
     if test_priority frame_header.flags then fun length ->
       lift2
         (fun priority headers -> Ok (HeadersFrame (Some priority, headers)))
-        parse_priority (take (length - 5))
+        parse_priority
+        (take (length - 5))
     else fun length -> lift (fun x -> Ok (HeadersFrame (None, x))) (take length)
   in
   parse_payload_with_padding frame_header parse_fn
@@ -160,9 +161,12 @@ let parse_push_promise_frame frame_header =
   let parse_fn length =
     lift2
       (fun s h -> Ok (PushPromiseFrame (s, h)))
-      stream_identifier (take (length - 4))
+      stream_identifier
+      (take (length - 4))
   in
   parse_payload_with_padding frame_header parse_fn
+
+let parse_ping_frame = lift (fun x -> Ok (PingFrame x)) (take 8)
 
 let get_parser_for_frame frame_header =
   match frame_header.frame_type with
@@ -172,6 +176,7 @@ let get_parser_for_frame frame_header =
   | FrameRSTStream -> parse_rst_stream
   | FrameSettings -> parse_settings_frame frame_header
   | FramePushPromise -> parse_push_promise_frame frame_header
+  | FramePing -> parse_ping_frame
   | _ -> failwith "not implemented yet"
 
 let parse_frame settings =

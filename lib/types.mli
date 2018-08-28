@@ -192,11 +192,13 @@ type frame_header =
 
 type data_frame = string
 
-type frame_payload = DataFrame of data_frame
-                   | HeadersFrame of priority option * string
-                   | PriorityFrame of priority
-                   | RSTStreamFrame of error_code_id
-                   | SettingsFrame of settings_list
-                   | PushPromiseFrame of stream_id * string
+type frame_payload =
+  | DataFrame of data_frame
+  | HeadersFrame of priority option * string
+  | PriorityFrame of priority
+  | RSTStreamFrame of error_code_id
+  | SettingsFrame of settings_list
+  | PushPromiseFrame of stream_id * string
+  | PingFrame of string
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}
