@@ -183,6 +183,12 @@ let parse_window_frame =
       else Ok (WindowUpdateFrame w') )
     BE.any_int32
 
+let parse_continuation_frame frame_header =
+  lift (fun x -> Ok (ContinuationFrame x)) (take frame_header.length)
+
+let parse_unknown_frame typ frame_header =
+  lift (fun x -> Ok (UnknownFrame (typ, x))) (take frame_header.length)
+
 let get_parser_for_frame frame_header =
   match frame_header.frame_type with
   | FrameData -> parse_data_frame frame_header
@@ -194,7 +200,8 @@ let get_parser_for_frame frame_header =
   | FramePing -> parse_ping_frame
   | FrameGoAway -> parse_go_away frame_header
   | FrameWindowUpdate -> parse_window_frame
-  | _ -> failwith "not implemented yet"
+  | FrameContinuation -> parse_continuation_frame frame_header
+  | FrameUnknown typ -> parse_unknown_frame typ frame_header
 
 let parse_frame settings =
   parse_frame_header

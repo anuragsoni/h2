@@ -202,5 +202,7 @@ type frame_payload =
   | PingFrame of string
   | GoAwayFrame of stream_id * error_code_id * string
   | WindowUpdateFrame of window_size
+  | ContinuationFrame of string
+  | UnknownFrame of frame_type * string
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}
