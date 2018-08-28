@@ -196,5 +196,6 @@ type frame_payload = DataFrame of data_frame
                    | HeadersFrame of priority option * string
                    | PriorityFrame of priority
                    | RSTStreamFrame of error_code_id
+                   | SettingsFrame of settings_list
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}
