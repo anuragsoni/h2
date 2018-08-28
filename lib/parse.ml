@@ -131,7 +131,7 @@ let parse_header_frame frame_header =
     if test_priority frame_header.flags then fun length ->
       lift2
         (fun priority headers -> Ok (HeadersFrame (Some priority, headers)))
-        parse_priority (take length)
+        parse_priority (take (length - 5))
     else fun length -> lift (fun x -> Ok (HeadersFrame (None, x))) (take length)
   in
   parse_payload_with_padding frame_header parse_fn
