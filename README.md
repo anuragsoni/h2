@@ -8,6 +8,6 @@ Aim to provide decoder/encoder and HTTP/2 types to be consumed by other projects
 
 ### Contributing
 
-* Look for the unfinished payload types from `./lib/types.mli`
+* Look for the unfinished payload types from [./lib/types.mli](https://github.com/anuragsoni/h2/blob/master/lib/types.mli#L195)
 * Parsing is done in `./lib/parse.ml`
 
