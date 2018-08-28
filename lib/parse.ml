@@ -156,6 +156,14 @@ let parse_settings_frame frame_header =
        error. *)
     (count num_settings parse_setting)
 
+let parse_push_promise_frame frame_header =
+  let parse_fn length =
+    lift2
+      (fun s h -> Ok (PushPromiseFrame (s, h)))
+      stream_identifier (take (length - 4))
+  in
+  parse_payload_with_padding frame_header parse_fn
+
 let get_parser_for_frame frame_header =
   match frame_header.frame_type with
   | FrameData -> parse_data_frame frame_header
@@ -163,6 +171,7 @@ let get_parser_for_frame frame_header =
   | FramePriority -> parse_priority_frame
   | FrameRSTStream -> parse_rst_stream
   | FrameSettings -> parse_settings_frame frame_header
+  | FramePushPromise -> parse_push_promise_frame frame_header
   | _ -> failwith "not implemented yet"
 
 let parse_frame settings =
