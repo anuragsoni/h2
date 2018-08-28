@@ -174,6 +174,15 @@ let parse_go_away frame_header =
     stream_identifier parse_error_code
     (take (frame_header.length - 8))
 
+let parse_window_frame =
+  lift
+    (fun w ->
+      let w' = clear_bit (Int32.to_int_exn w) 31 in
+      if w' = 0 then
+        Error (ConnectionError (ProtocolError, "window update must not be 0"))
+      else Ok (WindowUpdateFrame w') )
+    BE.any_int32
+
 let get_parser_for_frame frame_header =
   match frame_header.frame_type with
   | FrameData -> parse_data_frame frame_header
@@ -184,6 +193,7 @@ let get_parser_for_frame frame_header =
   | FramePushPromise -> parse_push_promise_frame frame_header
   | FramePing -> parse_ping_frame
   | FrameGoAway -> parse_go_away frame_header
+  | FrameWindowUpdate -> parse_window_frame
   | _ -> failwith "not implemented yet"
 
 let parse_frame settings =

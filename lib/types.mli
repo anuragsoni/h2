@@ -201,5 +201,6 @@ type frame_payload =
   | PushPromiseFrame of stream_id * string
   | PingFrame of string
   | GoAwayFrame of stream_id * error_code_id * string
+  | WindowUpdateFrame of window_size
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}
