@@ -351,5 +351,6 @@ type frame_payload =
   | SettingsFrame of settings_list
   | PushPromiseFrame of stream_id * string
   | PingFrame of string
+  | GoAwayFrame of stream_id * error_code_id * string
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}

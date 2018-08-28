@@ -137,10 +137,10 @@ let parse_header_frame frame_header =
   in
   parse_payload_with_padding frame_header parse_fn
 
-let parse_rst_stream =
-  lift
-    (fun x -> Ok (RSTStreamFrame (error_code_to_id (Int32.to_int_exn x))))
-    Angstrom.BE.any_int32
+let parse_error_code =
+  lift (fun x -> error_code_to_id (Int32.to_int_exn x)) Angstrom.BE.any_int32
+
+let parse_rst_stream = lift (fun x -> Ok (RSTStreamFrame x)) parse_error_code
 
 let parse_settings_frame frame_header =
   let num_settings = frame_header.length / 6 in
@@ -168,6 +168,12 @@ let parse_push_promise_frame frame_header =
 
 let parse_ping_frame = lift (fun x -> Ok (PingFrame x)) (take 8)
 
+let parse_go_away frame_header =
+  lift3
+    (fun s e x -> Ok (GoAwayFrame (s, e, x)))
+    stream_identifier parse_error_code
+    (take (frame_header.length - 8))
+
 let get_parser_for_frame frame_header =
   match frame_header.frame_type with
   | FrameData -> parse_data_frame frame_header
@@ -177,6 +183,7 @@ let get_parser_for_frame frame_header =
   | FrameSettings -> parse_settings_frame frame_header
   | FramePushPromise -> parse_push_promise_frame frame_header
   | FramePing -> parse_ping_frame
+  | FrameGoAway -> parse_go_away frame_header
   | _ -> failwith "not implemented yet"
 
 let parse_frame settings =
