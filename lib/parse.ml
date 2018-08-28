@@ -136,11 +136,15 @@ let parse_header_frame frame_header =
   in
   parse_payload_with_padding frame_header parse_fn
 
+let parse_rst_stream =
+  lift (fun x -> Ok (RSTStreamFrame (error_code_to_id (Int32.to_int_exn x)))) Angstrom.BE.any_int32
+
 let get_parser_for_frame frame_header =
   match frame_header.frame_type with
   | FrameData -> parse_data_frame frame_header
   | FrameHeaders -> parse_header_frame frame_header
   | FramePriority -> parse_priority_frame
+  | FrameRSTStream -> parse_rst_stream
   | _ -> failwith "not implemented yet"
 
 let parse_frame settings =
