@@ -214,12 +214,49 @@ let parse_frame settings =
         (Result.map x ~f:(fun frame_payload -> {frame_header; frame_payload}))
   | Error e -> return (Error e)
 
-let%test "read frame" =
+let%expect_test "read frame header" =
   let input = "\x01\x02\x03\x04\x05\x06\x07\x08\x09" in
-  Caml.Pervasives.( = )
-    (parse_string parse_frame_header input)
-    (Ok
-       { length = 66051
-       ; frame_type = FrameSettings
-       ; flags = 5
-       ; stream_id = 101124105 })
+  let expected = parse_string parse_frame_header input in
+  let printed =
+    Result.ok expected
+    |> Option.value
+         ~default:
+           {length = 0; frame_type = FrameUnknown 0; flags = 0; stream_id = 0}
+    |> sexp_of_frame_header |> Sexp.to_string
+  in
+  Caml.print_endline printed ;
+  [%expect
+    {| ((length 66051)(frame_type FrameSettings)(flags 5)(stream_id 101124105)) |}]
+
+let%expect_test "parse data frame, no padding" =
+  let input = "\x00\x00\x08\x00\x01\x00\x00\x00\x01testdata" in
+  let parsed = parse_string (parse_frame default_settings) input in
+  let output =
+    match parsed with
+    | Ok r -> (
+      match r with
+      | Ok frame -> sexp_of_frame frame |> Sexp.to_string
+      | _ -> "ERROR" )
+    | _ -> "ERROR"
+  in
+  Caml.print_endline output ;
+  [%expect
+    {| ((frame_header((length 8)(frame_type FrameData)(flags 1)(stream_id 1)))(frame_payload(DataFrame testdata))) |}]
+
+let%expect_test "parse data frame, with padding" =
+  let input =
+    "\x00\x00\x13\x00\t\x00\x00\x00\x01\n\
+     testdata\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+  in
+  let parsed = parse_string (parse_frame default_settings) input in
+  let output =
+    match parsed with
+    | Ok r -> (
+      match r with
+      | Ok frame -> sexp_of_frame frame |> Sexp.to_string
+      | _ -> "ERROR" )
+    | _ -> "ERROR"
+  in
+  Caml.print_endline output ;
+  [%expect
+    {| ((frame_header((length 19)(frame_type FrameData)(flags 9)(stream_id 1)))(frame_payload(DataFrame testdata))) |}]

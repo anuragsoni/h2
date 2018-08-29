@@ -19,6 +19,7 @@ let max_payload_length = Int.pow 2 14
 (* Stream identifer *)
 
 type stream_id = int
+[@@deriving sexp]
 
 (* Errors *)
 
@@ -40,6 +41,7 @@ type error_code_id =
   | InadequateSecurity
   | HTTP11Required
   | UnknownErrorCode of int
+[@@deriving sexp]
 
 let error_code_of_id = function
   | NoError -> 0x0
@@ -57,6 +59,7 @@ let error_code_of_id = function
   | InadequateSecurity -> 0xc
   | HTTP11Required -> 0xd
   | UnknownErrorCode x -> x
+[@@deriving sexp]
 
 let error_code_to_id = function
   | 0x0 -> NoError
@@ -74,10 +77,12 @@ let error_code_to_id = function
   | 0xc -> InadequateSecurity
   | 0xd -> HTTP11Required
   | w -> UnknownErrorCode w
+[@@deriving sexp]
 
 type http2_error =
   | ConnectionError of error_code_id * string
   | StreamError of error_code_id * stream_id
+[@@deriving sexp]
 
 let error_code_id_of_http = function
   | ConnectionError (err, _) -> err
@@ -92,10 +97,13 @@ type settings_key_id =
   | SettingsInitialWindowSize
   | SettingsMaxFrameSize
   | SettingsMaxHeaderListSize
+[@@deriving sexp]
 
 type window_size = int
+[@@deriving sexp]
 
 type settings_value = int
+[@@deriving sexp]
 
 let settings_key_from_id = function
   | SettingsHeaderTableSize -> 0x1
@@ -121,6 +129,7 @@ let max_window_size = 2147483647
 let is_window_overflow w = test_bit w 31
 
 type settings_list = (settings_key_id * settings_value) list
+[@@deriving sexp]
 
 type settings =
   { header_table_size : int
@@ -129,6 +138,7 @@ type settings =
   ; initial_window_size : window_size
   ; max_frame_size : int
   ; max_header_list_size : int option }
+[@@deriving sexp]
 
 let default_settings =
   { header_table_size = 4096
@@ -176,8 +186,10 @@ let update_settings settings kvs =
   List.fold_left kvs ~init:settings ~f:update
 
 type weight = int
+[@@deriving sexp]
 
 type priority = {exclusive : bool; stream_dependency : stream_id; weight : weight}
+[@@deriving sexp]
 
 let default_priority = {exclusive = false; stream_dependency = 0; weight = 16}
 
@@ -186,6 +198,7 @@ let highest_priority = {exclusive = false; stream_dependency = 0; weight = 256}
 (* Raw HTTP/2 frame types *)
 
 type frame_type = int
+[@@deriving sexp]
 
 type frame_type_id =
   | FrameData
@@ -199,6 +212,7 @@ type frame_type_id =
   | FrameWindowUpdate
   | FrameContinuation
   | FrameUnknown of int
+[@@deriving sexp]
 
 let frame_type_of_id = function
   | FrameData -> 0x0
@@ -242,6 +256,7 @@ let frame_type_id_to_name = function
 (* Flags *)
 
 type frame_flags = int
+[@@deriving sexp]
 
 type flag_type =
   | FlagDataEndStream
@@ -255,6 +270,7 @@ type flag_type =
   | FlagContinuationEndHeaders
   | FlagPushPromiseEndHeaders
   | FlagPushPromisePadded
+[@@deriving sexp]
 
 let has_flag t flag = t land flag = flag
 
@@ -336,12 +352,14 @@ let clear_exclusive id = clear_bit id 31
 (* HTTP/2 frame types *)
 
 type data_frame = string
+[@@deriving sexp]
 
 type frame_header =
   { length : int
   ; frame_type : frame_type_id
   ; flags : frame_flags
   ; stream_id : stream_id }
+[@@deriving sexp]
 
 type frame_payload =
   | DataFrame of data_frame
@@ -355,5 +373,7 @@ type frame_payload =
   | WindowUpdateFrame of window_size
   | ContinuationFrame of string
   | UnknownFrame of frame_type * string
+[@@deriving sexp]
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}
+[@@deriving sexp]

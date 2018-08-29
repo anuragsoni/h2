@@ -11,6 +11,7 @@ val frame_header_length : int
 val max_payload_length : int
 
 type stream_id = int
+[@@deriving sexp]
 
 (** Error Codes. See: {{: http://http2.github.io/http2-spec/#ErrorCodes}
     http://http2.github.io/http2-spec/#ErrorCodes *)
@@ -32,6 +33,7 @@ type error_code_id =
   | InadequateSecurity
   | HTTP11Required
   | UnknownErrorCode of int
+[@@deriving sexp]
 
 val error_code_of_id : error_code_id -> error_code
 
@@ -40,6 +42,7 @@ val error_code_to_id : error_code -> error_code_id
 type http2_error =
   | ConnectionError of error_code_id * string
   | StreamError of error_code_id * stream_id
+[@@deriving sexp]
 
 val error_code_id_of_http : http2_error -> error_code_id
 
@@ -53,10 +56,13 @@ type settings_key_id =
   | SettingsInitialWindowSize
   | SettingsMaxFrameSize
   | SettingsMaxHeaderListSize
+[@@deriving sexp]
 
 type window_size = int
+[@@deriving sexp]
 
 type settings_value = int
+[@@deriving sexp]
 
 val settings_key_from_id : settings_key_id -> int
 
@@ -69,6 +75,7 @@ val max_window_size : window_size
 val is_window_overflow : window_size -> bool
 
 type settings_list = (settings_key_id * settings_value) list
+[@@deriving sexp]
 
 type settings =
   { header_table_size : int
@@ -77,6 +84,7 @@ type settings =
   ; initial_window_size : window_size
   ; max_frame_size : int
   ; max_header_list_size : int option }
+[@@deriving sexp]
 
 val default_settings : settings
 
@@ -87,8 +95,10 @@ val check_settings_list : settings_list -> http2_error option
 val update_settings : settings -> settings_list -> settings
 
 type weight = int
+[@@deriving sexp]
 
 type priority = {exclusive : bool; stream_dependency : stream_id; weight : weight}
+[@@deriving sexp]
 
 (** Default priority for all streams. See: {{:
     http://http2.github.io/http2-spec/#pri-default}
@@ -104,6 +114,7 @@ val highest_priority : priority
     http://http2.github.io/http2-spec/#rfc.section.11.2}
     http://http2.github.io/http2-spec/#rfc.section.11.2} *)
 type frame_type = int
+[@@deriving sexp]
 
 type frame_type_id =
   | FrameData
@@ -117,6 +128,7 @@ type frame_type_id =
   | FrameWindowUpdate
   | FrameContinuation
   | FrameUnknown of int
+[@@deriving sexp]
 
 val frame_type_of_id : frame_type_id -> frame_type
 
@@ -125,6 +137,7 @@ val frame_type_to_id : frame_type -> frame_type_id
 val frame_type_id_to_name : frame_type_id -> string
 
 type frame_flags = int
+[@@deriving sexp]
 
 type flag_type =
   | FlagDataEndStream
@@ -138,6 +151,7 @@ type flag_type =
   | FlagContinuationEndHeaders
   | FlagPushPromiseEndHeaders
   | FlagPushPromisePadded
+[@@deriving sexp]
 
 val has_flag : frame_flags -> frame_flags -> bool
 
@@ -189,8 +203,10 @@ type frame_header =
   ; frame_type : frame_type_id
   ; flags : frame_flags
   ; stream_id : stream_id }
+[@@deriving sexp]
 
 type data_frame = string
+[@@deriving sexp]
 
 type frame_payload =
   | DataFrame of data_frame
@@ -204,5 +220,7 @@ type frame_payload =
   | WindowUpdateFrame of window_size
   | ContinuationFrame of string
   | UnknownFrame of frame_type * string
+[@@deriving sexp]
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}
+[@@deriving sexp]
