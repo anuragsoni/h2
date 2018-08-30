@@ -7,8 +7,8 @@ dev-repo: "git+https://github.com/anuragsoni/h2"
 bug-reports: "https://github.com/anuragsoni/h2/issues"
 license: "BSD-3-clause"
 build: [
-  ["dune" "subst" "-p" name] {pinned}
-  ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-j" jobs]
 ]
 build-test: [
   ["dune" "runtest" "-p" name]
