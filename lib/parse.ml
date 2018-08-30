@@ -213,13 +213,3 @@ let parse_frame settings =
       return
         (Result.map x ~f:(fun frame_payload -> {frame_header; frame_payload}))
   | Error e -> return (Error e)
-
-let%test "read frame" =
-  let input = "\x01\x02\x03\x04\x05\x06\x07\x08\x09" in
-  Caml.Pervasives.( = )
-    (parse_string parse_frame_header input)
-    (Ok
-       { length = 66051
-       ; frame_type = FrameSettings
-       ; flags = 5
-       ; stream_id = 101124105 })

@@ -1,0 +1,8 @@
+(executable
+  (name frames_test)
+  (libraries base hex alcotest frames))
+
+(alias
+  (name runtest)
+  (deps frames_test.exe)
+  (action (run %{deps} -q --color=always)))
