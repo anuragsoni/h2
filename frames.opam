@@ -3,7 +3,7 @@ name: "frames"
 maintainer: "Anurag Soni <anurag@sonianurag.com>"
 authors: ["Anurag Soni <anurag@sonianurag.com>"]
 homepage: "https://github.com/anuragsoni/h2"
-dev-repo: "https://github.com/anuragsoni/h2"
+dev-repo: "git+https://github.com/anuragsoni/h2"
 bug-reports: "https://github.com/anuragsoni/h2/issues"
 license: "BSD-3-clause"
 build: [
