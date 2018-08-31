@@ -18,9 +18,6 @@ let parse_priority_frame () =
   (* First frame *)
   Alcotest.(check int) "Flags" 0 parsed.frame_header.flags ;
   Alcotest.(check int) "Stream id" 9 parsed.frame_header.stream_id ;
-  Alcotest.(check int)
-    "Frame type" 2
-    (frame_type_of_id parsed.frame_header.frame_type) ;
   Alcotest.(check int) "length" 5 parsed.frame_header.length ;
   Alcotest.(check int) "Stream dependency" 11 payload.stream_dependency ;
   Alcotest.(check int) "Weight" 7 payload.weight ;
