@@ -1,4 +1,4 @@
 (library
   (public_name frames)
-  (libraries base angstrom)
+  (libraries base angstrom faraday)
   )

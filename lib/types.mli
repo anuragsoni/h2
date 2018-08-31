@@ -181,6 +181,8 @@ val set_exclusive : stream_id -> stream_id
 
 val clear_exclusive : stream_id -> stream_id
 
+type padding = string
+
 (** FrameHeader is the 9 byte header of all HTTP/2 frames. See:
     {{:http://http2.github.io/http2-spec/#FrameHeader}
     http://http2.github.io/http2-spec/#FrameHeader}*)
@@ -204,3 +206,5 @@ type frame_payload =
 val frame_payload_to_frame_id : frame_payload -> frame_type_id
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}
+
+val is_padding_defined : frame_payload -> bool
