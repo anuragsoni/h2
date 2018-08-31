@@ -101,7 +101,7 @@ let parse_frame_header =
 
 let parse_payload_with_padding frame_header parse_fn =
   if test_padded frame_header.flags then
-    any_int8
+    any_uint8
     >>= fun pad_length ->
     let body_lenth = frame_header.length - pad_length - 1 in
     if body_lenth < 0 then
@@ -122,7 +122,7 @@ let parse_priority =
         {exclusive = e; weight = w; stream_dependency = s' land ((1 lsl 31) - 1)}
       in
       p )
-    Angstrom.BE.any_int32 any_int8
+    Angstrom.BE.any_int32 any_uint8
 
 let parse_priority_frame = parse_priority >>| fun x -> Ok (PriorityFrame x)
 
