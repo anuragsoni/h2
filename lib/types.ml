@@ -183,6 +183,8 @@ let default_priority = {exclusive = false; stream_dependency = 0; weight = 16}
 
 let highest_priority = {exclusive = false; stream_dependency = 0; weight = 256}
 
+type padding = string
+
 (* Raw HTTP/2 frame types *)
 
 type frame_type = int
@@ -366,3 +368,16 @@ let frame_payload_to_frame_id = function
   | UnknownFrame (x, _) -> FrameUnknown x
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}
+
+let is_padding_defined = function
+  | DataFrame _ -> true
+  | HeadersFrame _ -> true
+  | PriorityFrame _ -> false
+  | RSTStreamFrame _ -> false
+  | SettingsFrame _ -> false
+  | PushPromiseFrame _ -> true
+  | PingFrame _ -> false
+  | GoAwayFrame _ -> false
+  | WindowUpdateFrame _ -> false
+  | ContinuationFrame _ -> false
+  | UnknownFrame _ -> false

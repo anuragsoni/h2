@@ -105,7 +105,7 @@ let parse_payload_with_padding frame_header parse_fn =
     >>= fun pad_length ->
     let body_lenth = frame_header.length - pad_length - 1 in
     if body_lenth < 0 then
-      return (Error (ConnectionError (ProtocolError, "padding is not enough")))
+      return (Error (ConnectionError (ProtocolError, "padding is not enough" ^ " " ^ (Int.to_string pad_length))))
     else parse_fn body_lenth
   else parse_fn frame_header.length
 

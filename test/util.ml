@@ -8,3 +8,6 @@ let parse_success wire =
   | Ok parsed -> (
     match parsed with Ok frame -> frame | _ -> failwith "ERROR" )
   | _ -> failwith "ERROR"
+
+let string_of_hex s =
+  Hex.to_string (`Hex s)
