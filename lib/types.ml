@@ -337,11 +337,7 @@ let clear_exclusive id = clear_bit id 31
 
 type data_frame = string
 
-type frame_header =
-  { length : int
-  ; frame_type : frame_type_id
-  ; flags : frame_flags
-  ; stream_id : stream_id }
+type frame_header = {length : int; flags : frame_flags; stream_id : stream_id}
 
 type frame_payload =
   | DataFrame of data_frame
@@ -355,5 +351,18 @@ type frame_payload =
   | WindowUpdateFrame of window_size
   | ContinuationFrame of string
   | UnknownFrame of frame_type * string
+
+let frame_payload_to_frame_id = function
+  | DataFrame _ -> FrameData
+  | HeadersFrame _ -> FrameHeaders
+  | PriorityFrame _ -> FramePriority
+  | RSTStreamFrame _ -> FrameRSTStream
+  | SettingsFrame _ -> FrameSettings
+  | PushPromiseFrame _ -> FramePushPromise
+  | PingFrame _ -> FramePing
+  | GoAwayFrame _ -> FrameGoAway
+  | WindowUpdateFrame _ -> FrameWindowUpdate
+  | ContinuationFrame _ -> FrameContinuation
+  | UnknownFrame (x, _) -> FrameUnknown x
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}

@@ -13,10 +13,10 @@ let non_zero_frame_types =
   ; FrameContinuation ]
 
 (* TODO: Go back and verify all these checks against spec. *)
-let check_frame_header settings frame_header =
+let check_frame_header settings frame_header frame_type =
   let open Polymorphic_compare in
   let {enable_push; _} = settings in
-  let {flags; length; frame_type; stream_id} = frame_header in
+  let {flags; length; stream_id} = frame_header in
   let check_frame_type = function
     | FrameData when stream_id = 0x0 ->
         Error
@@ -67,7 +67,7 @@ let check_frame_header settings frame_header =
         Error
           (ConnectionError
              (FrameSizeError, "payload length is 4 in window update frame"))
-    | _ -> Ok {flags; length; frame_type; stream_id}
+    | _ -> Ok {flags; length; stream_id}
   in
   if length > settings.max_frame_size then
     Error (ConnectionError (FrameSizeError, "exceeded maximum frame size"))
@@ -96,7 +96,7 @@ let stream_identifier =
 let parse_frame_header =
   lift4
     (fun length frame_type flags stream_id ->
-      {flags; length; frame_type; stream_id} )
+      (frame_type, {flags; length; stream_id}) )
     frame_length frame_type frame_flags stream_identifier
 
 let parse_payload_with_padding frame_header parse_fn =
@@ -189,8 +189,8 @@ let parse_continuation_frame frame_header =
 let parse_unknown_frame typ frame_header =
   lift (fun x -> Ok (UnknownFrame (typ, x))) (take frame_header.length)
 
-let get_parser_for_frame frame_header =
-  match frame_header.frame_type with
+let get_parser_for_frame frame_header frame_type =
+  match frame_type with
   | FrameData -> parse_data_frame frame_header
   | FrameHeaders -> parse_header_frame frame_header
   | FramePriority -> parse_priority_frame
@@ -205,10 +205,10 @@ let get_parser_for_frame frame_header =
 
 let parse_frame settings =
   parse_frame_header
-  >>= fun frame_header ->
-  match check_frame_header settings frame_header with
+  >>= fun (frame_type, frame_header) ->
+  match check_frame_header settings frame_header frame_type with
   | Ok frame_header ->
-      get_parser_for_frame frame_header
+      get_parser_for_frame frame_header frame_type
       >>= fun x ->
       return
         (Result.map x ~f:(fun frame_payload -> {frame_header; frame_payload}))

@@ -8,10 +8,6 @@ let wire_no_padding = "0000080001000000017465737464617461"
 
 let extract_payload = function DataFrame x -> x | _ -> failwith "BAD PAYLOAD"
 
-let expected_frame =
-  { frame_header = {length = 20; frame_type = FrameData; flags = 8; stream_id = 2}
-  ; frame_payload = DataFrame "Hello, world!" }
-
 let parse_data_frame_with_padding () =
   let parsed = Util.parse_success wire in
   Alcotest.(check int) "Header flags" 8 parsed.frame_header.flags ;

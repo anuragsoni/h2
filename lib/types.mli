@@ -184,11 +184,7 @@ val clear_exclusive : stream_id -> stream_id
 (** FrameHeader is the 9 byte header of all HTTP/2 frames. See:
     {{:http://http2.github.io/http2-spec/#FrameHeader}
     http://http2.github.io/http2-spec/#FrameHeader}*)
-type frame_header =
-  { length : int
-  ; frame_type : frame_type_id
-  ; flags : frame_flags
-  ; stream_id : stream_id }
+type frame_header = {length : int; flags : frame_flags; stream_id : stream_id}
 
 type data_frame = string
 
@@ -204,5 +200,7 @@ type frame_payload =
   | WindowUpdateFrame of window_size
   | ContinuationFrame of string
   | UnknownFrame of frame_type * string
+
+val frame_payload_to_frame_id : frame_payload -> frame_type_id
 
 type frame = {frame_header : frame_header; frame_payload : frame_payload}
