@@ -1,1 +1,4 @@
-let () = Alcotest.run "Frames tests" [("Dataframe tests", Data_frame_test.tests)]
+let () =
+  Alcotest.run "Frames tests"
+    [ ("Dataframe tests", Data_frame_test.tests)
+    ; ("Priority frame tests", Priority_frame_test.tests) ]
