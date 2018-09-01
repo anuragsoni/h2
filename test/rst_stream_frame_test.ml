@@ -25,6 +25,24 @@ let parse_rst_frame' () =
   Alcotest.(check int) "stream id" 1 parsed.frame_header.stream_id ;
   Alcotest.(check int) "Error code" 420 (error_code_of_id error)
 
+let serialize_rst_frame () =
+  let f = Faraday.create 4 in
+  let info = {Serialize.flags = 0; stream_id = 5; padding = None} in
+  let e = error_code_to_id 8 in
+  Serialize.write_frame f info (RSTStreamFrame e) ;
+  let res = Faraday.serialize_to_string f in
+  Alcotest.(check string) "Serialized rst frame" (Util.string_of_hex wire) res
+
+let serialize_rst_frame' () =
+  let f = Faraday.create 4 in
+  let info = {Serialize.flags = 0; stream_id = 1; padding = None} in
+  let e = error_code_to_id 420 in
+  Serialize.write_frame f info (RSTStreamFrame e) ;
+  let res = Faraday.serialize_to_string f in
+  Alcotest.(check string) "Serialized rst frame" (Util.string_of_hex wire2) res
+
 let tests =
-  [ ("Can parse rst stream header", `Quick, parse_rst_frame)
-  ; ("Second rst frame test", `Quick, parse_rst_frame') ]
+  [ ("Can parse rst stream frame", `Quick, parse_rst_frame)
+  ; ("Second rst frame test", `Quick, parse_rst_frame')
+  ; ("Serialize rst stream frame", `Quick, serialize_rst_frame)
+  ; ("Serialize rst stream 2", `Quick, serialize_rst_frame') ]
