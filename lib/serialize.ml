@@ -49,10 +49,26 @@ let write_data_frame info body =
   let length = String.length body in
   write_padded info length writer
 
+let write_priority {Types.exclusive; stream_dependency; weight} =
+  let stream =
+    if exclusive then Types.set_exclusive stream_dependency
+    else stream_dependency
+  in
+  fun t ->
+    BE.write_uint32 t (Int32.of_int stream) ;
+    write_uint8 t weight
+
+let write_priority_frame info priority =
+  let header =
+    {Types.flags = info.flags; stream_id = info.stream_id; length = 5}
+  in
+  (header, write_priority priority)
+
 let get_writer info frame =
   let open Types in
   match frame with
   | DataFrame body -> write_data_frame info body
+  | PriorityFrame p -> write_priority_frame info p
   | _ -> failwith "Not implemented yet"
 
 let write_frame t info payload =
