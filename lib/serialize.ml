@@ -64,11 +64,19 @@ let write_priority_frame info priority =
   in
   (header, write_priority priority)
 
+let write_rst_stream_frame info e =
+  let error_code = Types.error_code_of_id e in
+  let header =
+    {Types.flags = info.flags; stream_id = info.stream_id; length = 4}
+  in
+  (header, fun t -> BE.write_uint32 t (Int32.of_int error_code))
+
 let get_writer info frame =
   let open Types in
   match frame with
   | DataFrame body -> write_data_frame info body
   | PriorityFrame p -> write_priority_frame info p
+  | RSTStreamFrame e -> write_rst_stream_frame info e
   | _ -> failwith "Not implemented yet"
 
 let write_frame t info payload =
