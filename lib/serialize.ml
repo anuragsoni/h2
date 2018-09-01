@@ -71,12 +71,30 @@ let write_rst_stream_frame info e =
   in
   (header, fun t -> BE.write_uint32 t (Int32.of_int error_code))
 
+let write_settings_frame info settings =
+  let writer t =
+    let rec aux = function
+      | [] -> ()
+      | (key, value) :: xs ->
+          BE.write_uint16 t (Types.settings_key_from_id key) ;
+          BE.write_uint32 t (Int32.of_int value) ;
+          aux xs
+    in
+    aux settings
+  in
+  let header =
+    { Types.flags = info.flags
+    ; stream_id = info.stream_id
+    ; length = List.length settings * 6 }
+  in
+  (header, writer)
+
 let get_writer info frame =
-  let open Types in
   match frame with
-  | DataFrame body -> write_data_frame info body
-  | PriorityFrame p -> write_priority_frame info p
-  | RSTStreamFrame e -> write_rst_stream_frame info e
+  | Types.DataFrame body -> write_data_frame info body
+  | Types.PriorityFrame p -> write_priority_frame info p
+  | Types.RSTStreamFrame e -> write_rst_stream_frame info e
+  | Types.SettingsFrame settings -> write_settings_frame info settings
   | _ -> failwith "Not implemented yet"
 
 let write_frame t info payload =
