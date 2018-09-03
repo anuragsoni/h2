@@ -97,6 +97,13 @@ let write_push_promise_frame info stream header_block =
   in
   write_padded info length writer
 
+let write_ping_frame info payload =
+  let header =
+    {Types.flags = info.flags; stream_id = info.stream_id; length = 8}
+  in
+  let writer t = write_string t payload in
+  (header, writer)
+
 let get_writer info frame =
   match frame with
   | Types.DataFrame body -> write_data_frame info body
@@ -105,6 +112,7 @@ let get_writer info frame =
   | Types.SettingsFrame settings -> write_settings_frame info settings
   | Types.PushPromiseFrame (stream, header_block) ->
       write_push_promise_frame info stream header_block
+  | Types.PingFrame payload -> write_ping_frame info payload
   | _ -> failwith "Not implemented yet"
 
 let write_frame t info payload =
