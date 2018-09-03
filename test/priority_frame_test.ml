@@ -35,7 +35,7 @@ let serialize_priority_frame_1 () =
   let priority = {exclusive = false; stream_dependency = 11; weight = 7} in
   Frames.Serialize.write_frame f info (PriorityFrame priority) ;
   let res = Faraday.serialize_to_string f in
-  Alcotest.(check string) "Serialized" (Util.string_of_hex wire) res
+  Alcotest.(check string) "Serialized" wire (Util.hex_of_string res)
 
 let serialize_priority_frame_2 () =
   let info = {Serialize.flags = 0; padding = None; stream_id = 1} in
@@ -43,7 +43,7 @@ let serialize_priority_frame_2 () =
   let priority = {exclusive = true; stream_dependency = 4; weight = 64} in
   Frames.Serialize.write_frame f info (PriorityFrame priority) ;
   let res = Faraday.serialize_to_string f in
-  Alcotest.(check string) "Serialized" (Util.string_of_hex wire2) res
+  Alcotest.(check string) "Serialized" wire2 (Util.hex_of_string res)
 
 let tests =
   [ ("Can parse priority frame", `Quick, parse_priority_frame)

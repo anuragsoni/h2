@@ -89,12 +89,22 @@ let write_settings_frame info settings =
   in
   (header, writer)
 
+let write_push_promise_frame info stream header_block =
+  let length = 4 + String.length header_block in
+  let writer t =
+    BE.write_uint32 t (Int32.of_int stream) ;
+    write_string t header_block
+  in
+  write_padded info length writer
+
 let get_writer info frame =
   match frame with
   | Types.DataFrame body -> write_data_frame info body
   | Types.PriorityFrame p -> write_priority_frame info p
   | Types.RSTStreamFrame e -> write_rst_stream_frame info e
   | Types.SettingsFrame settings -> write_settings_frame info settings
+  | Types.PushPromiseFrame (stream, header_block) ->
+      write_push_promise_frame info stream header_block
   | _ -> failwith "Not implemented yet"
 
 let write_frame t info payload =

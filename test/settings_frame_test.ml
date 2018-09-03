@@ -12,6 +12,6 @@ let serialize_settings () =
   Serialize.write_frame f info (Types.SettingsFrame input) ;
   let output = Faraday.serialize_to_string f in
   Alcotest.(check string)
-    "Serialize settings frame" (Util.string_of_hex wire) output
+    "Serialize settings frame" wire (Util.hex_of_string output)
 
 let tests = [("Can serialize settings frame", `Quick, serialize_settings)]
