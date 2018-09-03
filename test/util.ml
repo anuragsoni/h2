@@ -11,3 +11,7 @@ let parse_success wire =
 
 let string_of_hex s =
   Hex.to_string (`Hex s)
+
+let hex_of_string s =
+  let (`Hex hex) = Hex.of_string s in
+  String.uppercase_ascii hex

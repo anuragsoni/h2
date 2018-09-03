@@ -34,7 +34,7 @@ let serialize_data_frame_with_padding () =
   Frames.Serialize.write_frame f info (DataFrame "Hello, world!") ;
   let serialized = Faraday.serialize_to_string f in
   Alcotest.(check string)
-    "Serialized data frame" (Util.string_of_hex wire) serialized
+    "Serialized data frame" wire (Util.hex_of_string serialized)
 
 let serialize_data_frame_without_padding () =
   let info = {Serialize.flags = 1; stream_id = 1; padding = None} in
@@ -43,8 +43,8 @@ let serialize_data_frame_without_padding () =
   let serialized = Faraday.serialize_to_string f in
   Alcotest.(check string)
     "Serialized data frame without padding"
-    (Util.string_of_hex wire_no_padding)
-    serialized
+    wire_no_padding
+    (Util.hex_of_string serialized)
 
 let tests =
   [ ( "Can parse dataframe payload with padding"
