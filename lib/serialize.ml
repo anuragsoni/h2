@@ -134,6 +134,13 @@ let write_continuation_frame info header_block =
   let writer t = write_string t header_block in
   (header, writer)
 
+(* TODO: This should probably be removed. We could handle unknown frames with its
+   own error code. Also, a server/client implementing HTTP/2 spec might never
+   actually need to serialize an unknown frame? *)
+let write_unknown_frame info payload =
+  let writer t = write_string t payload in
+  write_padded info (String.length payload) writer
+
 let get_writer info frame =
   match frame with
   | Types.DataFrame body -> write_data_frame info body
@@ -148,7 +155,8 @@ let get_writer info frame =
   | Types.WindowUpdateFrame window_size -> write_window_frame info window_size
   | Types.ContinuationFrame header_block ->
       write_continuation_frame info header_block
-  | _ -> failwith "Not implemented yet"
+  | Types.UnknownFrame (_, payload) -> write_unknown_frame info payload
+  | _ -> failwith "INVALID"
 
 let write_frame t info payload =
   let header, writer = get_writer info payload in
