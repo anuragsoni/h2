@@ -58,6 +58,21 @@ let write_priority {Types.exclusive; stream_dependency; weight} =
     BE.write_uint32 t (Int32.of_int stream) ;
     write_uint8 t weight
 
+let write_headers_frame info priority headers =
+  match priority with
+  | None ->
+      let length = String.length headers in
+      let writer t = write_string t headers in
+      write_padded info length writer
+  | Some priority' ->
+      let length = String.length headers + 5 in
+      let info' = {info with flags = Types.set_priority info.flags} in
+      let writer t =
+        (write_priority priority') t ;
+        write_string t headers
+      in
+      write_padded info' length writer
+
 let write_priority_frame info priority =
   let header =
     {Types.flags = info.flags; stream_id = info.stream_id; length = 5}
@@ -144,6 +159,8 @@ let write_unknown_frame info payload =
 let get_writer info frame =
   match frame with
   | Types.DataFrame body -> write_data_frame info body
+  | Types.HeadersFrame (priority, headers) ->
+      write_headers_frame info priority headers
   | Types.PriorityFrame p -> write_priority_frame info p
   | Types.RSTStreamFrame e -> write_rst_stream_frame info e
   | Types.SettingsFrame settings -> write_settings_frame info settings
@@ -156,7 +173,6 @@ let get_writer info frame =
   | Types.ContinuationFrame header_block ->
       write_continuation_frame info header_block
   | Types.UnknownFrame (_, payload) -> write_unknown_frame info payload
-  | _ -> failwith "INVALID"
 
 let write_frame t info payload =
   let header, writer = get_writer info payload in
