@@ -104,6 +104,19 @@ let write_ping_frame info payload =
   let writer t = write_string t payload in
   (header, writer)
 
+let write_go_away_frame info stream_id error_code_id debug_data =
+  let header =
+    { Types.flags = info.flags
+    ; stream_id = info.stream_id
+    ; length = 8 + String.length debug_data }
+  in
+  let writer t =
+    BE.write_uint32 t (Int32.of_int stream_id) ;
+    BE.write_uint32 t (Int32.of_int (Types.error_code_of_id error_code_id)) ;
+    write_string t debug_data
+  in
+  (header, writer)
+
 let get_writer info frame =
   match frame with
   | Types.DataFrame body -> write_data_frame info body
@@ -113,6 +126,8 @@ let get_writer info frame =
   | Types.PushPromiseFrame (stream, header_block) ->
       write_push_promise_frame info stream header_block
   | Types.PingFrame payload -> write_ping_frame info payload
+  | Types.GoAwayFrame (stream_id, error_code_id, debug_data) ->
+      write_go_away_frame info stream_id error_code_id debug_data
   | _ -> failwith "Not implemented yet"
 
 let write_frame t info payload =
