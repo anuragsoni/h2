@@ -58,6 +58,21 @@ let write_priority {Types.exclusive; stream_dependency; weight} =
     BE.write_uint32 t (Int32.of_int stream) ;
     write_uint8 t weight
 
+let write_headers_frame info priority headers =
+  match priority with
+  | None ->
+      let length = String.length headers in
+      let writer t = write_string t headers in
+      write_padded info length writer
+  | Some priority' ->
+      let length = String.length headers + 5 in
+      let info' = {info with flags = Types.set_priority info.flags} in
+      let writer t =
+        (write_priority priority') t ;
+        write_string t headers
+      in
+      write_padded info' length writer
+
 let write_priority_frame info priority =
   let header =
     {Types.flags = info.flags; stream_id = info.stream_id; length = 5}
@@ -125,9 +140,27 @@ let write_window_frame info window_size =
   let writer t = BE.write_uint32 t (Int32.of_int window_size) in
   (header, writer)
 
+let write_continuation_frame info header_block =
+  let header =
+    { Types.flags = info.flags
+    ; stream_id = info.stream_id
+    ; length = String.length header_block }
+  in
+  let writer t = write_string t header_block in
+  (header, writer)
+
+(* TODO: This should probably be removed. We could handle unknown frames with its
+   own error code. Also, a server/client implementing HTTP/2 spec might never
+   actually need to serialize an unknown frame? *)
+let write_unknown_frame info payload =
+  let writer t = write_string t payload in
+  write_padded info (String.length payload) writer
+
 let get_writer info frame =
   match frame with
   | Types.DataFrame body -> write_data_frame info body
+  | Types.HeadersFrame (priority, headers) ->
+      write_headers_frame info priority headers
   | Types.PriorityFrame p -> write_priority_frame info p
   | Types.RSTStreamFrame e -> write_rst_stream_frame info e
   | Types.SettingsFrame settings -> write_settings_frame info settings
@@ -137,7 +170,9 @@ let get_writer info frame =
   | Types.GoAwayFrame (stream_id, error_code_id, debug_data) ->
       write_go_away_frame info stream_id error_code_id debug_data
   | Types.WindowUpdateFrame window_size -> write_window_frame info window_size
-  | _ -> failwith "Not implemented yet"
+  | Types.ContinuationFrame header_block ->
+      write_continuation_frame info header_block
+  | Types.UnknownFrame (_, payload) -> write_unknown_frame info payload
 
 let write_frame t info payload =
   let header, writer = get_writer info payload in
