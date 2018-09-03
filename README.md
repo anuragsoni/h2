@@ -11,5 +11,3 @@ Aim to provide decoder/encoder and HTTP/2 types to be consumed by other projects
 * Add more tests
     1. Add tests comparing output with other existing HTTP/2 framing implementations (Go, python, rust, haskell are some of the known existing implementations)
 
-* Refactor for simplification/performance:
-    1. This is a first implementation focusing on getting something correct and working. I haven't tried to check performance at all. Contributions for simplifying current API and/or performance improvements are welcome.
