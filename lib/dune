@@ -1,4 +1,4 @@
 (library
-  (public_name frames)
+  (public_name http2)
   (libraries base angstrom faraday)
   )
