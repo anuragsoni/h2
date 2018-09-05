@@ -1,5 +1,5 @@
 opam-version: "1.2"
-name: "frames"
+name: "http2"
 maintainer: "Anurag Soni <anurag@sonianurag.com>"
 authors: ["Anurag Soni <anurag@sonianurag.com>"]
 homepage: "https://github.com/anuragsoni/h2"
