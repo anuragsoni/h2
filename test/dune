@@ -1,6 +1,6 @@
 (executable
   (name frames_test)
-  (libraries base hex alcotest http2))
+  (libraries base hex alcotest frames))
 
 (alias
   (name runtest)

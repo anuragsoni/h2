@@ -1,0 +1,30 @@
+lib: [
+  "_build/install/default/lib/frames/META" {"META"}
+  "_build/install/default/lib/frames/opam" {"opam"}
+  "_build/install/default/lib/frames/frames.cmi" {"frames.cmi"}
+  "_build/install/default/lib/frames/frames.cmx" {"frames.cmx"}
+  "_build/install/default/lib/frames/frames.cmt" {"frames.cmt"}
+  "_build/install/default/lib/frames/frames.ml-gen" {"frames.ml-gen"}
+  "_build/install/default/lib/frames/frames__Parse.cmi" {"frames__Parse.cmi"}
+  "_build/install/default/lib/frames/frames__Parse.cmx" {"frames__Parse.cmx"}
+  "_build/install/default/lib/frames/frames__Parse.cmt" {"frames__Parse.cmt"}
+  "_build/install/default/lib/frames/parse.ml" {"parse.ml"}
+  "_build/install/default/lib/frames/frames__Serialize.cmi" {"frames__Serialize.cmi"}
+  "_build/install/default/lib/frames/frames__Serialize.cmx" {"frames__Serialize.cmx"}
+  "_build/install/default/lib/frames/frames__Serialize.cmt" {"frames__Serialize.cmt"}
+  "_build/install/default/lib/frames/serialize.ml" {"serialize.ml"}
+  "_build/install/default/lib/frames/frames__Types.cmi" {"frames__Types.cmi"}
+  "_build/install/default/lib/frames/frames__Types.cmx" {"frames__Types.cmx"}
+  "_build/install/default/lib/frames/frames__Types.cmt" {"frames__Types.cmt"}
+  "_build/install/default/lib/frames/frames__Types.cmti" {"frames__Types.cmti"}
+  "_build/install/default/lib/frames/types.mli" {"types.mli"}
+  "_build/install/default/lib/frames/types.ml" {"types.ml"}
+  "_build/install/default/lib/frames/frames.cma" {"frames.cma"}
+  "_build/install/default/lib/frames/frames.cmxa" {"frames.cmxa"}
+  "_build/install/default/lib/frames/frames.a" {"frames.a"}
+  "_build/install/default/lib/frames/frames.cmxs" {"frames.cmxs"}
+  "_build/install/default/lib/frames/frames.dune" {"frames.dune"}
+]
+doc: [
+  "_build/install/default/doc/frames/README.md"
+]

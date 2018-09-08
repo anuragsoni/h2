@@ -1,4 +1,4 @@
-open Http2
+open Frames
 open Types
 
 (* Payload with padding *)
@@ -31,7 +31,7 @@ let parse_data_frame_no_padding () =
 let serialize_data_frame_with_padding () =
   let info = {Serialize.flags = 8; stream_id = 2; padding = Some "Howdy!"} in
   let f = Faraday.create 20 in
-  Serialize.write_frame f info (DataFrame "Hello, world!") ;
+  Frames.Serialize.write_frame f info (DataFrame "Hello, world!") ;
   let serialized = Faraday.serialize_to_string f in
   Alcotest.(check string)
     "Serialized data frame" wire (Util.hex_of_string serialized)
@@ -39,7 +39,7 @@ let serialize_data_frame_with_padding () =
 let serialize_data_frame_without_padding () =
   let info = {Serialize.flags = 1; stream_id = 1; padding = None} in
   let f = Faraday.create 8 in
-  Serialize.write_frame f info (DataFrame "testdata") ;
+  Frames.Serialize.write_frame f info (DataFrame "testdata") ;
   let serialized = Faraday.serialize_to_string f in
   Alcotest.(check string)
     "Serialized data frame without padding"
