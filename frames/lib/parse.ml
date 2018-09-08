@@ -35,18 +35,18 @@ let check_frame_header settings frame_header frame_type =
           (ConnectionError
              ( FrameSizeError
              , "insufficient payload for Pad length and priority fields" ))
-    | FramePriority when not (length = 5) ->
+    | FramePriority when length <> 5 ->
         Error (StreamError (FrameSizeError, stream_id))
-    | FrameRSTStream when not (length = 4) ->
+    | FrameRSTStream when length <> 4 ->
         Error
           (ConnectionError
              (FrameSizeError, "payload length is not 4 in rst stream frame"))
-    | FrameSettings when not (length % 6 = 0) ->
+    | FrameSettings when length % 6 <> 0 ->
         Error
           (ConnectionError
              ( FrameSizeError
              , "payload length is not multiple of 6 in settings frame" ))
-    | FrameSettings when test_ack flags && not (length = 0) ->
+    | FrameSettings when test_ack flags && length <> 0 ->
         Error
           (ConnectionError
              (FrameSizeError, "payload length must be 0 if ack flag is set"))
@@ -56,14 +56,14 @@ let check_frame_header settings frame_header frame_type =
         Error
           (ConnectionError
              (ProtocolError, "push promise must be used with response streams"))
-    | FramePing when not (length = 8) ->
+    | FramePing when length <> 8 ->
         Error
           (ConnectionError (FrameSizeError, "payload length is 8 in ping frame"))
     | FrameGoAway when length < 8 ->
         Error
           (ConnectionError
              (FrameSizeError, "go away body must be 8 bytes or more"))
-    | FrameWindowUpdate when not (length = 4) ->
+    | FrameWindowUpdate when length <> 4 ->
         Error
           (ConnectionError
              (FrameSizeError, "payload length is 4 in window update frame"))
@@ -105,7 +105,11 @@ let parse_payload_with_padding frame_header parse_fn =
     >>= fun pad_length ->
     let body_lenth = frame_header.length - pad_length - 1 in
     if body_lenth < 0 then
-      return (Error (ConnectionError (ProtocolError, "padding is not enough" ^ " " ^ (Int.to_string pad_length))))
+      return
+        (Error
+           (ConnectionError
+              ( ProtocolError
+              , "padding is not enough" ^ " " ^ Int.to_string pad_length )))
     else parse_fn body_lenth
   else parse_fn frame_header.length
 

@@ -2,7 +2,7 @@ open Base
 
 (* Utilities *)
 
-let test_bit x i = not (Int.equal (x land (1 lsl i)) 0)
+let test_bit x i = x land (1 lsl i) <> 0
 
 let set_bit x i = x lor (1 lsl i)
 
@@ -140,7 +140,7 @@ let default_settings =
 
 let check_settings_value = function
   | SettingsEnablePush, v ->
-      if (not (Int.equal v 0)) && not (Int.equal v 1) then
+      if v <> 0 && v <> 1 then
         Some (ConnectionError (ProtocolError, "enable push must be 0 or 1"))
       else None
   | SettingsInitialWindowSize, v ->
