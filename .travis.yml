@@ -5,11 +5,11 @@ services:
 - docker
 env:
   global:
-  - PINS="http2:."
+  - PINS="frames:."
   - DISTRO="debian-stable"
   matrix:
-  - PACKAGE="http2" OCAML_VERSION="4.03"
-  - PACKAGE="http2" OCAML_VERSION="4.04"
-  - PACKAGE="http2" OCAML_VERSION="4.05"
-  - PACKAGE="http2" OCAML_VERSION="4.06"
-  - PACKAGE="http2" OCAML_VERSION="4.07"
+  - PACKAGE="frames" OCAML_VERSION="4.03"
+  - PACKAGE="frames" OCAML_VERSION="4.04"
+  - PACKAGE="frames" OCAML_VERSION="4.05"
+  - PACKAGE="frames" OCAML_VERSION="4.06"
+  - PACKAGE="frames" OCAML_VERSION="4.07"
