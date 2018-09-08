@@ -1,0 +1,4 @@
+(library
+  (public_name http2)
+  (preprocess (pps ppx_sexp_conv))
+  (libraries frames angstrom faraday bigstringaf))

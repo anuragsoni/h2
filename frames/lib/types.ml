@@ -23,6 +23,7 @@ type stream_id = int
 (* Errors *)
 
 type error_code = int
+[@@deriving sexp]
 
 type error_code_id =
   | NoError

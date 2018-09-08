@@ -1,4 +1,4 @@
-wrap-comments=true
+wrap-comments=false
 margin=82
 doc-comments=before
 field-space=loose

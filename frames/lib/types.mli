@@ -13,8 +13,9 @@ val max_payload_length : int
 type stream_id = int
 
 (** Error Codes. See: {{: http://http2.github.io/http2-spec/#ErrorCodes}
-    http://http2.github.io/http2-spec/#ErrorCodes *)
+    http://http2.github.io/http2-spec/#ErrorCodes} *)
 type error_code = int
+[@@deriving sexp]
 
 type error_code_id =
   | NoError
