@@ -69,4 +69,18 @@ module State : sig
   val is_reset : state -> bool
 
   val set_reset : state -> Frames.Types.error_code -> unit
+
+  (** Transition the local stream to closed state. The local stream
+      will not send any more data. *)
+  val send_close : state -> (unit, Frames.Types.http2_error) Result.t
+
+  (** Transition a remote stream to closed state. The remote stream
+      will not send any more data. *)
+  val recv_close : state -> (unit, Frames.Types.http2_error) Result.t
+
+  (** Transition the local stream to open state. *)
+  val send_open : state -> bool -> (unit, Frames.Types.http2_error) Result.t
+
+  (** Transition the remote stream to open state. *)
+  val recv_open : state -> bool -> (unit, Frames.Types.http2_error) Result.t
 end
