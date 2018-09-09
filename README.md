@@ -1,13 +1,18 @@
-# HTTP/2 framing
+# HTTP/2 protocol [WIP]
 
-Exploring HTTP/2 framing in OCaml. Attempting to use angstrom/faraday in the hope that it becomes easy to port this to be used within [httpaf](https://github.com/inhabitedtype/httpaf).
+This is a work in progress implementation of the HTTP/2 protocol stack in OCaml.
 
-### Goal
+## What's available so far?
 
-Aim to provide decoder/encoder and HTTP/2 types to be consumed by other projects.
+* Parser/Serializer for HTTP/2 frames. [link](https://github.com/anuragsoni/h2/tree/start-state-machine/frames)
 
-### Contributing
+## What's left?
 
-* Add more tests
-    1. Add tests comparing output with other existing HTTP/2 framing implementations (Go, python, rust, haskell are some of the known existing implementations)
+* Everything :)
+	1. Priority
+	2. Hpack
+	3. HTTP/2 stream/connection state machines
 
+## Notes
+
+One of the goal of the implementation will be to make it easy to embed in other OCaml programs. This implementation will not handle TLS, HTTP/1 connection upgrades, etc.
