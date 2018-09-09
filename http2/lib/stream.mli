@@ -63,4 +63,10 @@ module State : sig
   val is_recv_streaming : state -> bool
 
   val can_recv_headers : state -> bool
+
+  val is_send_streaming : state -> bool
+
+  val is_reset : state -> bool
+
+  val set_reset : state -> Frames.Types.error_code -> unit
 end

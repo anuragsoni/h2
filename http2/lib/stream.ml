@@ -47,4 +47,18 @@ module State = struct
     | HalfClosedLocal AwaitingHeaders -> true
     | ReservedRemote -> true
     | _ -> false
+
+  let is_send_streaming state =
+    match state.value with
+    | Open {local = Streaming; _} -> true
+    | HalfClosedRemote Streaming -> true
+    | _ -> false
+
+  let is_reset state =
+    match state.value with
+    | Closed EndStream -> false
+    | Closed _ -> true
+    | _ -> false
+
+  let set_reset state reason = state.value <- Closed (LocallyReset reason)
 end
