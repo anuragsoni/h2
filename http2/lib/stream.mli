@@ -83,4 +83,12 @@ module State : sig
 
   (** Transition the remote stream to open state. *)
   val recv_open : state -> bool -> (unit, Frames.Types.http2_error) Result.t
+
+  (** Transition from idle to reserved remote state *)
+  val reserve_remote : state -> (unit, Frames.Types.http2_error) Result.t
+
+  (** Transition from idle to reserved local state *)
+  val reserve_local : state -> (unit, Frames.Types.http2_error) Result.t
+
+  val recv_reset : state -> Frames.Types.error_code -> bool -> unit
 end

@@ -135,4 +135,27 @@ module State = struct
                (Types.ProtocolError, "invalid action on state"))
     in
     Result.map ~f:(fun s -> state.value <- s) new_state
+
+  let reserve_remote state =
+    match state.value with
+    | Idle ->
+        state.value <- ReservedRemote ;
+        Ok ()
+    | _ ->
+        Error
+          (Types.ConnectionError (Types.ProtocolError, "invalid stream state"))
+
+  let reserve_local state =
+    match state.value with
+    | Idle ->
+        state.value <- ReservedLocal ;
+        Ok ()
+    | _ ->
+        Error
+          (Types.ConnectionError (Types.ProtocolError, "Invalid stream state"))
+
+  let recv_reset state reason queued =
+    match state.value with
+    | Closed _ when not queued -> ()
+    | _ -> state.value <- Closed (LocallyReset reason)
 end
