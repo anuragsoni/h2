@@ -18,6 +18,8 @@ module State = struct
 
   type state = {mutable value : t} [@@deriving sexp]
 
+  type action = SendPushPromise | RecvPushPromise | SendHeader | RecvHeader
+
   let create = {value = Idle}
 
   let is_idle state = match state.value with Idle -> true | _ -> false
@@ -60,102 +62,27 @@ module State = struct
     | Closed _ -> true
     | _ -> false
 
-  let set_reset state reason = state.value <- Closed (LocallyReset reason)
-
-  let send_close state =
-    let new_state =
-      match state.value with
-      | Open {remote; _} -> Ok (HalfClosedLocal remote)
-      | HalfClosedRemote _ -> Ok (Closed EndStream)
-      | _ ->
-          Error
-            (Types.ConnectionError
-               (Types.ProtocolError, "invalid action on state"))
-    in
-    Result.map ~f:(fun s -> state.value <- s) new_state
-
-  let recv_close state =
-    let new_state =
-      match state.value with
-      | Open {local; _} -> Ok (HalfClosedRemote local)
-      | HalfClosedLocal _ -> Ok (Closed EndStream)
-      | _ ->
-          Error
-            (Types.ConnectionError
-               (Types.ProtocolError, "invalid action on state"))
-    in
-    Result.map ~f:(fun s -> state.value <- s) new_state
-
-  let send_open state end_of_stream =
-    let local = Streaming in
-    let new_state =
-      match state.value with
-      | Idle ->
-          Ok
-            ( if end_of_stream then HalfClosedLocal AwaitingHeaders
-            else Open {local; remote = AwaitingHeaders} )
-      | Open {local = AwaitingHeaders; remote} ->
-          Ok
-            ( if end_of_stream then HalfClosedLocal remote
-            else Open {local; remote} )
-      | ReservedLocal ->
-          Ok
-            ( if end_of_stream then Closed EndStream
-            else Open {local; remote = AwaitingHeaders} )
-      | HalfClosedRemote AwaitingHeaders ->
-          Ok (if end_of_stream then Closed EndStream else HalfClosedRemote local)
-      | _ ->
-          Error
-            (Types.ConnectionError
-               (Types.ProtocolError, "invalid action on state"))
-    in
-    Result.map ~f:(fun s -> state.value <- s) new_state
-
-  let recv_open state end_of_stream =
-    let remote = Streaming in
-    let new_state =
-      match state.value with
-      | Idle ->
-          Ok
-            ( if end_of_stream then HalfClosedRemote AwaitingHeaders
-            else Open {local = AwaitingHeaders; remote} )
-      | ReservedRemote ->
-          Ok
-            ( if end_of_stream then Closed EndStream
-            else Open {local = AwaitingHeaders; remote} )
-      | Open {local; remote = AwaitingHeaders} ->
-          Ok
-            ( if end_of_stream then HalfClosedRemote local
-            else Open {local; remote} )
-      | HalfClosedLocal AwaitingHeaders ->
-          Ok (if end_of_stream then Closed EndStream else HalfClosedLocal remote)
-      | _ ->
-          Error
-            (Types.ConnectionError
-               (Types.ProtocolError, "invalid action on state"))
-    in
-    Result.map ~f:(fun s -> state.value <- s) new_state
-
-  let reserve_remote state =
-    match state.value with
-    | Idle ->
-        state.value <- ReservedRemote ;
-        Ok ()
-    | _ ->
-        Error
-          (Types.ConnectionError (Types.ProtocolError, "invalid stream state"))
-
-  let reserve_local state =
-    match state.value with
-    | Idle ->
+  let transition state ?(is_end_stream = false) action =
+    match (state.value, action) with
+    | Idle, SendPushPromise ->
         state.value <- ReservedLocal ;
         Ok ()
-    | _ ->
-        Error
-          (Types.ConnectionError (Types.ProtocolError, "Invalid stream state"))
-
-  let recv_reset state reason queued =
-    match state.value with
-    | Closed _ when not queued -> ()
-    | _ -> state.value <- Closed (LocallyReset reason)
+    | Idle, RecvPushPromise ->
+        state.value <- ReservedRemote ;
+        Ok ()
+    | Idle, SendHeader when is_end_stream ->
+        state.value <- HalfClosedLocal AwaitingHeaders ;
+        Ok ()
+    | Idle, SendHeader ->
+        state.value <- Open {local = Streaming; remote = AwaitingHeaders} ;
+        Ok ()
+    | Idle, RecvHeader when is_end_stream ->
+        state.value <- HalfClosedRemote AwaitingHeaders ;
+        Ok ()
+    | Idle, RecvHeader ->
+        state.value <- Open {local = AwaitingHeaders; remote = Streaming} ;
+        Ok ()
+    | ReservedLocal, SendHeader ->
+      state.value <- HalfClosedRemote(Streaming);
+      Ok ()
 end

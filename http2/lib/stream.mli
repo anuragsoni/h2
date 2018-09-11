@@ -50,6 +50,8 @@ module State : sig
 
   type state [@@deriving sexp]
 
+  type action = SendPushPromise | RecvPushPromise | SendHeader | RecvHeader
+
   val create : state
 
   val is_idle : state -> bool
@@ -68,27 +70,9 @@ module State : sig
 
   val is_reset : state -> bool
 
-  val set_reset : state -> Frames.Types.error_code -> unit
-
-  (** Transition the local stream to closed state. The local stream
-      will not send any more data. *)
-  val send_close : state -> (unit, Frames.Types.http2_error) Result.t
-
-  (** Transition a remote stream to closed state. The remote stream
-      will not send any more data. *)
-  val recv_close : state -> (unit, Frames.Types.http2_error) Result.t
-
-  (** Transition the local stream to open state. *)
-  val send_open : state -> bool -> (unit, Frames.Types.http2_error) Result.t
-
-  (** Transition the remote stream to open state. *)
-  val recv_open : state -> bool -> (unit, Frames.Types.http2_error) Result.t
-
-  (** Transition from idle to reserved remote state *)
-  val reserve_remote : state -> (unit, Frames.Types.http2_error) Result.t
-
-  (** Transition from idle to reserved local state *)
-  val reserve_local : state -> (unit, Frames.Types.http2_error) Result.t
-
-  val recv_reset : state -> Frames.Types.error_code -> bool -> unit
+  val transition :
+       state
+    -> ?is_end_stream:bool
+    -> action
+    -> (unit, Frames.Types.http2_error) Result.t
 end
