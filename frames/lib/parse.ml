@@ -98,6 +98,7 @@ let parse_frame_header =
     (fun length frame_type flags stream_id ->
       (frame_type, {flags; length; stream_id}) )
     frame_length frame_type frame_flags stream_identifier
+  <* commit
 
 let parse_payload_with_padding frame_header parse_fn =
   if test_padded frame_header.flags then
