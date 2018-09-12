@@ -1,8 +1,8 @@
 val test_bit : int -> int -> bool
 
-val set_bit : int -> int -> int
+val test_bit_int32 : int32 -> int -> bool
 
-val complement_bit : int -> int -> int
+val set_bit : int -> int -> int
 
 val clear_bit : int -> int -> int
 
@@ -10,11 +10,11 @@ val frame_header_length : int
 
 val max_payload_length : int
 
-type stream_id = int
+type stream_id = int32
 
 (** Error Codes. See: {{: http://http2.github.io/http2-spec/#ErrorCodes}
     http://http2.github.io/http2-spec/#ErrorCodes *)
-type error_code = int
+type error_code = int32
 
 type error_code_id =
   | NoError
@@ -31,7 +31,7 @@ type error_code_id =
   | EnhanceYourCalm
   | InadequateSecurity
   | HTTP11Required
-  | UnknownErrorCode of int
+  | UnknownErrorCode of int32
 
 val error_code_of_id : error_code_id -> error_code
 

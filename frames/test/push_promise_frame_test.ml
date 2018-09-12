@@ -13,25 +13,25 @@ let extract_payload payload =
 let parse_push_promise_frame () =
   let parsed = Util.parse_success wire in
   Alcotest.(check int) "Flags" 12 parsed.frame_header.flags ;
-  Alcotest.(check int) "Stream id" 10 parsed.frame_header.stream_id ;
+  Alcotest.(check int32) "Stream id" 10l parsed.frame_header.stream_id ;
   Alcotest.(check int) "Length" 24 parsed.frame_header.length ;
   let stream, message = extract_payload parsed.frame_payload in
-  Alcotest.(check int) "Stream id" 12 stream ;
+  Alcotest.(check int32) "Stream id" 12l stream ;
   Alcotest.(check string) "message" "this is dummy" message
 
 let serialize_push_promise_frame_with_padding () =
-  let info = {Serialize.flags = 12; stream_id = 10; padding = Some "Howdy!"} in
+  let info = {Serialize.flags = 12; stream_id = 10l; padding = Some "Howdy!"} in
   let f = Faraday.create 24 in
   Frames.Serialize.write_frame f info
-    (Types.PushPromiseFrame (12, "this is dummy")) ;
+    (Types.PushPromiseFrame (12l, "this is dummy")) ;
   let output = Faraday.serialize_to_string f in
   Alcotest.(check string) "Serialized" (Util.string_of_hex wire) output
 
 let serialize_push_promise_frame_without_padding () =
-  let info = {Serialize.flags = 12; stream_id = 10; padding = None} in
+  let info = {Serialize.flags = 12; stream_id = 10l; padding = None} in
   let f = Faraday.create 24 in
   Frames.Serialize.write_frame f info
-    (Types.PushPromiseFrame (12, "this is dummy")) ;
+    (Types.PushPromiseFrame (12l, "this is dummy")) ;
   let output = Faraday.serialize_to_string f in
   Alcotest.(check string) "Serialized" (Util.string_of_hex wire') output
 

@@ -23,7 +23,7 @@ let write_frame_header t frame_type {Types.length; flags; stream_id} =
   write_24 t length ;
   write_uint8 t (Types.frame_type_of_id frame_type) ;
   write_uint8 t flags ;
-  BE.write_uint32 t (Int32.of_int stream_id)
+  BE.write_uint32 t stream_id
 
 let write_padded info length writer =
   match info.padding with
@@ -54,9 +54,7 @@ let write_priority {Types.exclusive; stream_dependency; weight} =
     if exclusive then Types.set_exclusive stream_dependency
     else stream_dependency
   in
-  fun t ->
-    BE.write_uint32 t (Int32.of_int stream) ;
-    write_uint8 t weight
+  fun t -> BE.write_uint32 t stream ; write_uint8 t weight
 
 let write_headers_frame info priority headers =
   match priority with
@@ -84,7 +82,7 @@ let write_rst_stream_frame info e =
   let header =
     {Types.flags = info.flags; stream_id = info.stream_id; length = 4}
   in
-  (header, fun t -> BE.write_uint32 t (Int32.of_int error_code))
+  (header, fun t -> BE.write_uint32 t error_code)
 
 let write_settings_frame info settings =
   let writer t =
@@ -106,10 +104,7 @@ let write_settings_frame info settings =
 
 let write_push_promise_frame info stream header_block =
   let length = 4 + String.length header_block in
-  let writer t =
-    BE.write_uint32 t (Int32.of_int stream) ;
-    write_string t header_block
-  in
+  let writer t = BE.write_uint32 t stream ; write_string t header_block in
   write_padded info length writer
 
 let write_ping_frame info payload =
@@ -126,8 +121,8 @@ let write_go_away_frame info stream_id error_code_id debug_data =
     ; length = 8 + String.length debug_data }
   in
   let writer t =
-    BE.write_uint32 t (Int32.of_int stream_id) ;
-    BE.write_uint32 t (Int32.of_int (Types.error_code_of_id error_code_id)) ;
+    BE.write_uint32 t stream_id ;
+    BE.write_uint32 t (Types.error_code_of_id error_code_id) ;
     write_string t debug_data
   in
   (header, writer)

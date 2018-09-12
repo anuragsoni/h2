@@ -2,13 +2,23 @@ open Base
 
 (* Utilities *)
 
+let test_bit_int32 x i =
+  let open Int32 in
+  x land (1l lsl i) <> 0l
+
 let test_bit x i = x land (1 lsl i) <> 0
 
 let set_bit x i = x lor (1 lsl i)
 
-let complement_bit x i = x lxor (1 lsl i)
+let set_bit_int32 x i =
+  let open Int32 in
+  x lor (1l lsl i)
 
 let clear_bit x i = x land lnot (1 lsl i)
+
+let clear_bit_int32 x i =
+  let open Int32 in
+  x land lnot (1l lsl i)
 
 (* Constants *)
 
@@ -18,11 +28,11 @@ let max_payload_length = Int.pow 2 14
 
 (* Stream identifer *)
 
-type stream_id = int
+type stream_id = int32
 
 (* Errors *)
 
-type error_code = int
+type error_code = int32
 
 type error_code_id =
   | NoError
@@ -39,40 +49,40 @@ type error_code_id =
   | EnhanceYourCalm
   | InadequateSecurity
   | HTTP11Required
-  | UnknownErrorCode of int
+  | UnknownErrorCode of int32
 
 let error_code_of_id = function
-  | NoError -> 0x0
-  | ProtocolError -> 0x1
-  | InternalError -> 0x2
-  | FlowControlError -> 0x3
-  | SettingsTimeout -> 0x4
-  | StreamClosed -> 0x5
-  | FrameSizeError -> 0x6
-  | RefusedStream -> 0x7
-  | Cancel -> 0x8
-  | CompressionError -> 0x9
-  | ConnectError -> 0xa
-  | EnhanceYourCalm -> 0xb
-  | InadequateSecurity -> 0xc
-  | HTTP11Required -> 0xd
+  | NoError -> 0x0l
+  | ProtocolError -> 0x1l
+  | InternalError -> 0x2l
+  | FlowControlError -> 0x3l
+  | SettingsTimeout -> 0x4l
+  | StreamClosed -> 0x5l
+  | FrameSizeError -> 0x6l
+  | RefusedStream -> 0x7l
+  | Cancel -> 0x8l
+  | CompressionError -> 0x9l
+  | ConnectError -> 0xal
+  | EnhanceYourCalm -> 0xbl
+  | InadequateSecurity -> 0xcl
+  | HTTP11Required -> 0xdl
   | UnknownErrorCode x -> x
 
 let error_code_to_id = function
-  | 0x0 -> NoError
-  | 0x1 -> ProtocolError
-  | 0x2 -> InternalError
-  | 0x3 -> FlowControlError
-  | 0x4 -> SettingsTimeout
-  | 0x5 -> StreamClosed
-  | 0x6 -> FrameSizeError
-  | 0x7 -> RefusedStream
-  | 0x8 -> Cancel
-  | 0x9 -> CompressionError
-  | 0xa -> ConnectError
-  | 0xb -> EnhanceYourCalm
-  | 0xc -> InadequateSecurity
-  | 0xd -> HTTP11Required
+  | 0x0l -> NoError
+  | 0x1l -> ProtocolError
+  | 0x2l -> InternalError
+  | 0x3l -> FlowControlError
+  | 0x4l -> SettingsTimeout
+  | 0x5l -> StreamClosed
+  | 0x6l -> FrameSizeError
+  | 0x7l -> RefusedStream
+  | 0x8l -> Cancel
+  | 0x9l -> CompressionError
+  | 0xal -> ConnectError
+  | 0xbl -> EnhanceYourCalm
+  | 0xcl -> InadequateSecurity
+  | 0xdl -> HTTP11Required
   | w -> UnknownErrorCode w
 
 type http2_error =
@@ -179,9 +189,9 @@ type weight = int
 
 type priority = {exclusive : bool; stream_dependency : stream_id; weight : weight}
 
-let default_priority = {exclusive = false; stream_dependency = 0; weight = 16}
+let default_priority = {exclusive = false; stream_dependency = 0l; weight = 16}
 
-let highest_priority = {exclusive = false; stream_dependency = 0; weight = 256}
+let highest_priority = {exclusive = false; stream_dependency = 0l; weight = 256}
 
 type padding = string
 
@@ -323,17 +333,19 @@ let set_priority x = set_bit x 5
 
 (* Streams *)
 
-let is_control id = id = 0
+let is_control id = Int32.(id = 0l)
 
-let is_request id = id % 2 = 1
+let is_request id = Int32.(id % 2l = 1l)
 
-let is_response id = if id = 0 then false else id % 2 = 0
+let is_response id =
+  let open Int32 in
+  if id = 0l then false else id % 2l = 0l
 
-let test_exclusive id = test_bit id 31
+let test_exclusive id = test_bit_int32 id 31
 
-let set_exclusive id = set_bit id 31
+let set_exclusive id = set_bit_int32 id 31
 
-let clear_exclusive id = clear_bit id 31
+let clear_exclusive id = clear_bit_int32 id 31
 
 (* HTTP/2 frame types *)
 
