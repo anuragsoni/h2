@@ -15,7 +15,7 @@ let parse_rst_frame () =
   Alcotest.(check int) "Length" 4 parsed.frame_header.length ;
   Alcotest.(check int) "flags" 0 parsed.frame_header.flags ;
   Alcotest.(check int) "stream id" 5 parsed.frame_header.stream_id ;
-  Alcotest.(check int) "Error code" 8 (error_code_of_id error)
+  Alcotest.(check int32) "Error code" 8l (error_code_of_id error)
 
 let parse_rst_frame' () =
   let parsed = Util.parse_success wire2 in
@@ -23,12 +23,12 @@ let parse_rst_frame' () =
   Alcotest.(check int) "Length" 4 parsed.frame_header.length ;
   Alcotest.(check int) "flags" 0 parsed.frame_header.flags ;
   Alcotest.(check int) "stream id" 1 parsed.frame_header.stream_id ;
-  Alcotest.(check int) "Error code" 420 (error_code_of_id error)
+  Alcotest.(check int32) "Error code" 420l (error_code_of_id error)
 
 let serialize_rst_frame () =
   let f = Faraday.create 4 in
   let info = {Serialize.flags = 0; stream_id = 5; padding = None} in
-  let e = error_code_to_id 8 in
+  let e = error_code_to_id 8l in
   Serialize.write_frame f info (RSTStreamFrame e) ;
   let res = Faraday.serialize_to_string f in
   Alcotest.(check string) "Serialized rst frame" wire (Util.hex_of_string res)
@@ -36,7 +36,7 @@ let serialize_rst_frame () =
 let serialize_rst_frame' () =
   let f = Faraday.create 4 in
   let info = {Serialize.flags = 0; stream_id = 1; padding = None} in
-  let e = error_code_to_id 420 in
+  let e = error_code_to_id 420l in
   Serialize.write_frame f info (RSTStreamFrame e) ;
   let res = Faraday.serialize_to_string f in
   Alcotest.(check string) "Serialized rst frame" wire2 (Util.hex_of_string res)

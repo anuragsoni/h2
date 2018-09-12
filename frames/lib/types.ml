@@ -22,7 +22,7 @@ type stream_id = int
 
 (* Errors *)
 
-type error_code = int
+type error_code = int32
 
 type error_code_id =
   | NoError
@@ -39,40 +39,40 @@ type error_code_id =
   | EnhanceYourCalm
   | InadequateSecurity
   | HTTP11Required
-  | UnknownErrorCode of int
+  | UnknownErrorCode of int32
 
 let error_code_of_id = function
-  | NoError -> 0x0
-  | ProtocolError -> 0x1
-  | InternalError -> 0x2
-  | FlowControlError -> 0x3
-  | SettingsTimeout -> 0x4
-  | StreamClosed -> 0x5
-  | FrameSizeError -> 0x6
-  | RefusedStream -> 0x7
-  | Cancel -> 0x8
-  | CompressionError -> 0x9
-  | ConnectError -> 0xa
-  | EnhanceYourCalm -> 0xb
-  | InadequateSecurity -> 0xc
-  | HTTP11Required -> 0xd
+  | NoError -> 0x0l
+  | ProtocolError -> 0x1l
+  | InternalError -> 0x2l
+  | FlowControlError -> 0x3l
+  | SettingsTimeout -> 0x4l
+  | StreamClosed -> 0x5l
+  | FrameSizeError -> 0x6l
+  | RefusedStream -> 0x7l
+  | Cancel -> 0x8l
+  | CompressionError -> 0x9l
+  | ConnectError -> 0xal
+  | EnhanceYourCalm -> 0xbl
+  | InadequateSecurity -> 0xcl
+  | HTTP11Required -> 0xdl
   | UnknownErrorCode x -> x
 
 let error_code_to_id = function
-  | 0x0 -> NoError
-  | 0x1 -> ProtocolError
-  | 0x2 -> InternalError
-  | 0x3 -> FlowControlError
-  | 0x4 -> SettingsTimeout
-  | 0x5 -> StreamClosed
-  | 0x6 -> FrameSizeError
-  | 0x7 -> RefusedStream
-  | 0x8 -> Cancel
-  | 0x9 -> CompressionError
-  | 0xa -> ConnectError
-  | 0xb -> EnhanceYourCalm
-  | 0xc -> InadequateSecurity
-  | 0xd -> HTTP11Required
+  | 0x0l -> NoError
+  | 0x1l -> ProtocolError
+  | 0x2l -> InternalError
+  | 0x3l -> FlowControlError
+  | 0x4l -> SettingsTimeout
+  | 0x5l -> StreamClosed
+  | 0x6l -> FrameSizeError
+  | 0x7l -> RefusedStream
+  | 0x8l -> Cancel
+  | 0x9l -> CompressionError
+  | 0xal -> ConnectError
+  | 0xbl -> EnhanceYourCalm
+  | 0xcl -> InadequateSecurity
+  | 0xdl -> HTTP11Required
   | w -> UnknownErrorCode w
 
 type http2_error =

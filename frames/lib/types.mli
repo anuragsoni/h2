@@ -14,7 +14,7 @@ type stream_id = int
 
 (** Error Codes. See: {{: http://http2.github.io/http2-spec/#ErrorCodes}
     http://http2.github.io/http2-spec/#ErrorCodes *)
-type error_code = int
+type error_code = int32
 
 type error_code_id =
   | NoError
@@ -31,7 +31,7 @@ type error_code_id =
   | EnhanceYourCalm
   | InadequateSecurity
   | HTTP11Required
-  | UnknownErrorCode of int
+  | UnknownErrorCode of int32
 
 val error_code_of_id : error_code_id -> error_code
 

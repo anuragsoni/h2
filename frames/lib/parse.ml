@@ -52,8 +52,7 @@ let parse_header_frame frame_header =
   in
   parse_payload_with_padding frame_header parse_fn
 
-let parse_error_code =
-  lift (fun x -> error_code_to_id (Int32.to_int_exn x)) Angstrom.BE.any_int32
+let parse_error_code = lift (fun x -> error_code_to_id x) Angstrom.BE.any_int32
 
 let parse_rst_stream = lift (fun x -> RSTStreamFrame x) parse_error_code
 

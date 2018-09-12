@@ -84,7 +84,7 @@ let write_rst_stream_frame info e =
   let header =
     {Types.flags = info.flags; stream_id = info.stream_id; length = 4}
   in
-  (header, fun t -> BE.write_uint32 t (Int32.of_int error_code))
+  (header, fun t -> BE.write_uint32 t error_code)
 
 let write_settings_frame info settings =
   let writer t =
@@ -127,7 +127,7 @@ let write_go_away_frame info stream_id error_code_id debug_data =
   in
   let writer t =
     BE.write_uint32 t (Int32.of_int stream_id) ;
-    BE.write_uint32 t (Int32.of_int (Types.error_code_of_id error_code_id)) ;
+    BE.write_uint32 t (Types.error_code_of_id error_code_id) ;
     write_string t debug_data
   in
   (header, writer)
