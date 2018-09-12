@@ -1,0 +1,4 @@
+(library
+  (public_name h2)
+  (libraries base angstrom faraday frames)
+  )

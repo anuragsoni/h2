@@ -1,0 +1,24 @@
+opam-version: "1.2"
+name: "h2"
+maintainer: "Anurag Soni <anurag@sonianurag.com>"
+authors: ["Anurag Soni <anurag@sonianurag.com>"]
+homepage: "https://github.com/anuragsoni/h2"
+dev-repo: "git+https://github.com/anuragsoni/h2"
+bug-reports: "https://github.com/anuragsoni/h2/issues"
+license: "BSD-3-clause"
+build: [
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-j" jobs]
+]
+build-test: [
+  ["dune" "runtest" "-p" name]
+]
+depends: [
+  "dune" {build & >= "1.1"}
+  "angstrom" {>= "0.9.0"}
+  "faraday" {>= "0.5.0" }
+  "base" {>= "0.11.0"}
+  "frames"
+  "alcotest" {test}
+]
+available: [ ocaml-version >= "4.04.2" ]
