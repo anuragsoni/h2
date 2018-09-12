@@ -1,4 +1,4 @@
-.PHONY: default build install uninstall test clean utop-frames
+.PHONY: default build install uninstall test clean utop-frames utop-h2
 
 default: build
 
@@ -18,4 +18,7 @@ clean:
 	dune clean
 
 utop-frames:
-	dune utop lib
+	dune utop frames/lib
+
+utop-h2:
+	dune utop h2/lib

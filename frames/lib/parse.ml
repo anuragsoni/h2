@@ -18,10 +18,10 @@ let parse_payload_with_padding frame_header parse_fn =
   if test_padded frame_header.flags then
     any_uint8
     >>= fun pad_length ->
-    let body_lenth = frame_header.length - pad_length - 1 in
-    if body_lenth < 0 then
+    let body_length = frame_header.length - pad_length - 1 in
+    if body_length < 0 then
       fail ("padding is not enough " ^ Int.to_string pad_length)
-    else parse_fn body_lenth
+    else parse_fn body_length
   else parse_fn frame_header.length
 
 let parse_data_frame frame_header =
@@ -121,13 +121,13 @@ let parse_frame_header =
     (fun length frame_type flags stream_id ->
       (frame_type, {flags; length; stream_id}) )
     frame_length frame_type frame_flags stream_identifier
-  <* commit
+  <?> "frame header" <* commit
 
 let parse_frame_payload frame_type frame_header =
-  get_parser_for_frame frame_header frame_type
+  get_parser_for_frame frame_header frame_type <?> "frame payload" <* commit
 
 let parse_frame =
   parse_frame_header
   >>= fun (frame_type, frame_header) ->
-  get_parser_for_frame frame_header frame_type
+  parse_frame_payload frame_type frame_header
   >>| fun frame_payload -> {frame_header; frame_payload}
