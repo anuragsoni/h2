@@ -11,8 +11,11 @@ let frame_type = lift (fun x -> frame_type_to_id x) any_uint8
 
 let frame_flags = any_uint8
 
-let stream_identifier =
-  lift (fun x -> Int32.to_int_exn x land ((1 lsl 31) - 1)) Angstrom.BE.any_int32
+let extract_stream_id s =
+  let open Int32 in
+  s land ((1l lsl 31) - 1l)
+
+let stream_identifier = lift (fun x -> extract_stream_id x) Angstrom.BE.any_int32
 
 let parse_payload_with_padding frame_header parse_fn =
   if test_padded frame_header.flags then
@@ -31,10 +34,9 @@ let parse_data_frame frame_header =
 let parse_priority =
   lift2
     (fun s w ->
-      let s' = Int32.to_int_exn s in
-      let e = test_bit s' 32 in
+      let e = test_exclusive s in
       let p =
-        {exclusive = e; weight = w; stream_dependency = s' land ((1 lsl 31) - 1)}
+        {exclusive = e; weight = w; stream_dependency = extract_stream_id s}
       in
       p )
     Angstrom.BE.any_int32 any_uint8

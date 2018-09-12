@@ -12,7 +12,7 @@ let parse_data_frame_with_padding () =
   let parsed = Util.parse_success wire in
   Alcotest.(check int) "Header flags" 8 parsed.frame_header.flags ;
   Alcotest.(check int) "Length" 20 parsed.frame_header.length ;
-  Alcotest.(check int) "StreamId" 2 parsed.frame_header.stream_id ;
+  Alcotest.(check int32) "StreamId" 2l parsed.frame_header.stream_id ;
   Alcotest.(check bool) "Padded" true (test_padded parsed.frame_header.flags) ;
   Alcotest.(check string)
     "Payload" "Hello, world!"
@@ -22,14 +22,14 @@ let parse_data_frame_no_padding () =
   let parsed = Util.parse_success wire_no_padding in
   Alcotest.(check int) "Length" 8 parsed.frame_header.length ;
   Alcotest.(check int) "Flags" 1 parsed.frame_header.flags ;
-  Alcotest.(check int) "StreamId" 1 parsed.frame_header.stream_id ;
+  Alcotest.(check int32) "StreamId" 1l parsed.frame_header.stream_id ;
   Alcotest.(check bool) "Padded" false (test_padded parsed.frame_header.flags) ;
   Alcotest.(check string)
     "Payload" "testdata"
     (extract_payload parsed.frame_payload)
 
 let serialize_data_frame_with_padding () =
-  let info = {Serialize.flags = 8; stream_id = 2; padding = Some "Howdy!"} in
+  let info = {Serialize.flags = 8; stream_id = 2l; padding = Some "Howdy!"} in
   let f = Faraday.create 20 in
   Frames.Serialize.write_frame f info (DataFrame "Hello, world!") ;
   let serialized = Faraday.serialize_to_string f in
@@ -37,7 +37,7 @@ let serialize_data_frame_with_padding () =
     "Serialized data frame" wire (Util.hex_of_string serialized)
 
 let serialize_data_frame_without_padding () =
-  let info = {Serialize.flags = 1; stream_id = 1; padding = None} in
+  let info = {Serialize.flags = 1; stream_id = 1l; padding = None} in
   let f = Faraday.create 8 in
   Frames.Serialize.write_frame f info (DataFrame "testdata") ;
   let serialized = Faraday.serialize_to_string f in

@@ -6,7 +6,7 @@ let wire_priority =
   "000022012C000000030F8000001409746869732069732064756D6D79546869732069732070616464696E67"
 
 let serialize_headers_frame_no_priority () =
-  let info = {Serialize.flags = 4; stream_id = 1; padding = None} in
+  let info = {Serialize.flags = 4; stream_id = 1l; padding = None} in
   let f = Faraday.create 13 in
   Frames.Serialize.write_frame f info
     (Types.HeadersFrame (None, "this is dummy")) ;
@@ -16,9 +16,9 @@ let serialize_headers_frame_no_priority () =
 
 let serialize_headers_frame_with_priority () =
   let info =
-    {Serialize.flags = 44; stream_id = 3; padding = Some "This is padding"}
+    {Serialize.flags = 44; stream_id = 3l; padding = Some "This is padding"}
   in
-  let priority = {Types.exclusive = true; stream_dependency = 20; weight = 9} in
+  let priority = {Types.exclusive = true; stream_dependency = 20l; weight = 9} in
   let f = Faraday.create 35 in
   Frames.Serialize.write_frame f info
     (Types.HeadersFrame (Some priority, "this is dummy")) ;

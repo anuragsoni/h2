@@ -2,13 +2,23 @@ open Base
 
 (* Utilities *)
 
+let test_bit_int32 x i =
+  let open Int32 in
+  x land (1l lsl i) <> 0l
+
 let test_bit x i = x land (1 lsl i) <> 0
 
 let set_bit x i = x lor (1 lsl i)
 
-let complement_bit x i = x lxor (1 lsl i)
+let set_bit_int32 x i =
+  let open Int32 in
+  x lor (1l lsl i)
 
 let clear_bit x i = x land lnot (1 lsl i)
+
+let clear_bit_int32 x i =
+  let open Int32 in
+  x land lnot (1l lsl i)
 
 (* Constants *)
 
@@ -18,7 +28,7 @@ let max_payload_length = Int.pow 2 14
 
 (* Stream identifer *)
 
-type stream_id = int
+type stream_id = int32
 
 (* Errors *)
 
@@ -179,9 +189,9 @@ type weight = int
 
 type priority = {exclusive : bool; stream_dependency : stream_id; weight : weight}
 
-let default_priority = {exclusive = false; stream_dependency = 0; weight = 16}
+let default_priority = {exclusive = false; stream_dependency = 0l; weight = 16}
 
-let highest_priority = {exclusive = false; stream_dependency = 0; weight = 256}
+let highest_priority = {exclusive = false; stream_dependency = 0l; weight = 256}
 
 type padding = string
 
@@ -323,17 +333,19 @@ let set_priority x = set_bit x 5
 
 (* Streams *)
 
-let is_control id = id = 0
+let is_control id = Int32.(id = 0l)
 
-let is_request id = id % 2 = 1
+let is_request id = Int32.(id % 2l = 1l)
 
-let is_response id = if id = 0 then false else id % 2 = 0
+let is_response id =
+  let open Int32 in
+  if id = 0l then false else id % 2l = 0l
 
-let test_exclusive id = test_bit id 31
+let test_exclusive id = test_bit_int32 id 31
 
-let set_exclusive id = set_bit id 31
+let set_exclusive id = set_bit_int32 id 31
 
-let clear_exclusive id = clear_bit id 31
+let clear_exclusive id = clear_bit_int32 id 31
 
 (* HTTP/2 frame types *)
 
