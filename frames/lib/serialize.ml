@@ -5,7 +5,7 @@ type frame_info =
   ; stream_id : Types.stream_id
   ; padding : Types.padding option }
 
-let make_frame_info set_flag stream_id =
+let make_frame_info ~set_flag ~stream_id =
   {flags = set_flag Types.default_flags; stream_id; padding = None}
 
 let write_24 t i =
@@ -13,11 +13,6 @@ let write_24 t i =
   let w1 = (i lsr 8) land 0xff in
   let w2 = i land 0xff in
   write_uint8 t w0 ; write_uint8 t w1 ; write_uint8 t w2
-
-let write_16 t i =
-  let w0 = (i lsr 8) land 0xff in
-  let w1 = i land 0xff in
-  write_uint8 t w0 ; write_uint8 t w1
 
 let write_frame_header t frame_type {Types.length; flags; stream_id} =
   write_24 t length ;
