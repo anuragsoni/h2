@@ -126,9 +126,3 @@ let parse_frame_header =
 
 let parse_frame_payload frame_type frame_header =
   get_parser_for_frame frame_header frame_type <?> "frame payload" <* commit
-
-let parse_frame =
-  parse_frame_header
-  >>= fun (frame_type, frame_header) ->
-  parse_frame_payload frame_type frame_header
-  >>| fun frame_payload -> {frame_header; frame_payload}
