@@ -1,5 +1,5 @@
 open Base
-module FT = Frames.Types
+module FT = Types
 
 type continuable = [`Headers | `PushPromise]
 
@@ -9,11 +9,10 @@ type t = {partial : partial option}
 
 let create = {partial = None}
 
-let frame_header = Angstrom.parse_bigstring Frames.Parse.parse_frame_header
+let frame_header = Angstrom.parse_bigstring Parse.parse_frame_header
 
 let frame_payload frame_type frame_header =
-  Angstrom.parse_bigstring
-    (Frames.Parse.parse_frame_payload frame_type frame_header)
+  Angstrom.parse_bigstring (Parse.parse_frame_payload frame_type frame_header)
 
 let read_frame conn bs =
   let open Result.Monad_infix in

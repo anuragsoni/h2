@@ -1,11 +1,11 @@
-open Frames
+open H2
 
 let wire = "000018050C0000000A060000000C746869732069732064756D6D79486F77647921"
 
 let wire' = "000011050c0000000a0000000c746869732069732064756d6d79"
 
 let extract_payload payload =
-  let open Frames.Types in
+  let open Types in
   match payload with
   | PushPromiseFrame (s, m) -> (s, m)
   | _ -> failwith "INVALID FRAME"
@@ -22,16 +22,14 @@ let parse_push_promise_frame () =
 let serialize_push_promise_frame_with_padding () =
   let info = {Serialize.flags = 12; stream_id = 10l; padding = Some "Howdy!"} in
   let f = Faraday.create 24 in
-  Frames.Serialize.write_frame f info
-    (Types.PushPromiseFrame (12l, "this is dummy")) ;
+  Serialize.write_frame f info (Types.PushPromiseFrame (12l, "this is dummy")) ;
   let output = Faraday.serialize_to_string f in
   Alcotest.(check string) "Serialized" (Util.string_of_hex wire) output
 
 let serialize_push_promise_frame_without_padding () =
   let info = {Serialize.flags = 12; stream_id = 10l; padding = None} in
   let f = Faraday.create 24 in
-  Frames.Serialize.write_frame f info
-    (Types.PushPromiseFrame (12l, "this is dummy")) ;
+  Serialize.write_frame f info (Types.PushPromiseFrame (12l, "this is dummy")) ;
   let output = Faraday.serialize_to_string f in
   Alcotest.(check string) "Serialized" (Util.string_of_hex wire') output
 

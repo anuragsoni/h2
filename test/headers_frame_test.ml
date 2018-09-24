@@ -1,4 +1,4 @@
-open Frames
+open H2
 
 let wire_no_priority = "00000D010400000001746869732069732064756D6D79"
 
@@ -8,8 +8,7 @@ let wire_priority =
 let serialize_headers_frame_no_priority () =
   let info = {Serialize.flags = 4; stream_id = 1l; padding = None} in
   let f = Faraday.create 13 in
-  Frames.Serialize.write_frame f info
-    (Types.HeadersFrame (None, "this is dummy")) ;
+  Serialize.write_frame f info (Types.HeadersFrame (None, "this is dummy")) ;
   let output = Faraday.serialize_to_string f in
   Alcotest.(check string)
     "Serialize" wire_no_priority (Util.hex_of_string output)
@@ -20,7 +19,7 @@ let serialize_headers_frame_with_priority () =
   in
   let priority = {Types.exclusive = true; stream_dependency = 20l; weight = 9} in
   let f = Faraday.create 35 in
-  Frames.Serialize.write_frame f info
+  Serialize.write_frame f info
     (Types.HeadersFrame (Some priority, "this is dummy")) ;
   let output = Faraday.serialize_to_string f in
   Alcotest.(check string) "Serialize" wire_priority (Util.hex_of_string output)

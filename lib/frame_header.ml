@@ -1,5 +1,4 @@
 open Base
-open Frames
 open Types
 
 let zero_frame_types = [FrameSettings; FramePing; FrameGoAway]
