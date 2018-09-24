@@ -22,7 +22,7 @@ end = struct
   let deficit_table =
     let round x = floor (x +. 0.5) in
     Array.init 256 (fun i ->
-        Float.to_int (round (Float.of_int steps /. Float.of_int (i + 1))) )
+        int_of_float (round (float_of_int steps /. float_of_int (i + 1))) )
 
   let deficit_of_weight w = deficit_table.(w - 1)
 end
