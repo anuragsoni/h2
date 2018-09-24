@@ -1,4 +1,4 @@
-opam-version: "1.2"
+opam-version: "2.0"
 name: "frames"
 maintainer: "Anurag Soni <anurag@sonianurag.com>"
 authors: ["Anurag Soni <anurag@sonianurag.com>"]
@@ -8,17 +8,17 @@ bug-reports: "https://github.com/anuragsoni/h2/issues"
 license: "BSD-3-clause"
 build: [
   ["dune" "subst"] {pinned}
-  ["dune" "build" "-j" jobs]
+  ["dune" "build" "-p" name "-j" jobs]
 ]
-build-test: [
+run-test: [
   ["dune" "runtest" "-p" name]
 ]
 depends: [
+  "ocaml" {>= "4.04.2" }
   "dune" {build & >= "1.1"}
   "angstrom" {>= "0.9.0"}
   "faraday" {>= "0.5.0" }
   "base" {>= "0.11.0"}
-  "hex" {test}
-  "alcotest" {test}
+  "hex" {with-test}
+  "alcotest" {with-test}
 ]
-available: [ ocaml-version >= "4.04.2" ]
