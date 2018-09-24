@@ -1,0 +1,8 @@
+(executables
+  (names h2_test)
+  (libraries base hex alcotest h2))
+
+(alias
+  (name runtest)
+  (deps h2_test.exe)
+  (action (run %{deps} -q --color=always)))

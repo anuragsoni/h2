@@ -1,4 +1,4 @@
-open Frames
+open H2
 open Types
 
 let extract_payload = function
@@ -33,7 +33,7 @@ let serialize_priority_frame_1 () =
   let info = {Serialize.flags = 0; padding = None; stream_id = 9l} in
   let f = Faraday.create 5 in
   let priority = {exclusive = false; stream_dependency = 11l; weight = 7} in
-  Frames.Serialize.write_frame f info (PriorityFrame priority) ;
+  Serialize.write_frame f info (PriorityFrame priority) ;
   let res = Faraday.serialize_to_string f in
   Alcotest.(check string) "Serialized" wire (Util.hex_of_string res)
 
@@ -41,7 +41,7 @@ let serialize_priority_frame_2 () =
   let info = {Serialize.flags = 0; padding = None; stream_id = 1l} in
   let f = Faraday.create 5 in
   let priority = {exclusive = true; stream_dependency = 4l; weight = 64} in
-  Frames.Serialize.write_frame f info (PriorityFrame priority) ;
+  Serialize.write_frame f info (PriorityFrame priority) ;
   let res = Faraday.serialize_to_string f in
   Alcotest.(check string) "Serialized" wire2 (Util.hex_of_string res)
 
