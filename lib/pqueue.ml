@@ -5,15 +5,19 @@ module Priority : sig
 
   type t = {deficit : deficit; weight : weight}
 
+  val create : weight:Types.weight -> t
+
   val compare : t -> t -> int
 
   val deficit_of_weight : weight -> deficit
 end = struct
   type deficit = int
 
-  type weight = int
+  type weight = Types.weight
 
   type t = {deficit : deficit; weight : weight}
+
+  let create ~weight = {weight; deficit = 0}
 
   let compare {deficit = d1; _} {deficit = d2; _} = compare (d1 : int) d2
 

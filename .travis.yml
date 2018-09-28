@@ -8,6 +8,5 @@ env:
   - PINS="h2:."
   - DISTRO="debian-stable"
   matrix:
-  - PACKAGE="h2" OCAML_VERSION="4.04"
-  - PACKAGE="h2" OCAML_VERSION="4.05"
   - PACKAGE="h2" OCAML_VERSION="4.06"
+  - PACKAGE="h2" OCAML_VERSION="4.07"
